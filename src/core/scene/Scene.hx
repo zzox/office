@@ -1,0 +1,65 @@
+package core.scene;
+
+import core.components.Family;
+import core.components.FrameAnim;
+import core.gameobjects.GameObject;
+import core.gameobjects.Sprite;
+import core.system.Camera;
+import kha.Image;
+import kha.graphics2.Graphics;
+
+class Scene /* implements Destroyable */ {
+    public var destroyed:Bool = false;
+
+    public var entities:Array<GameObject> = [];
+
+    public var camera:Camera;
+
+    public function new () {}
+
+    public function create () {}
+
+    public function update (delta:Float) {
+        for (e in entities) {
+            if (e.active) e.update(delta);
+        }
+
+        camera.update(delta);
+    }
+
+    // called when drawing, passes in graphics instance
+    // overriding render will require you to call begin, clear and end
+    // public function render (graphics:Graphics, g4:kha.graphics4.Graphics, clears:Bool) {
+    public function render (graphics:Graphics, clears:Bool) {
+        graphics.begin(clears, camera.bgColor);
+
+        for (e in entities) {
+            if (e.visible) e.render(graphics, camera);
+        }
+
+// #if debug_physics
+//         for (sprite in entities) {
+//             sprite.renderDebug(graphics, camera);
+//         }
+// #end
+        graphics.end();
+    }
+
+    public inline function makeSprite (x:Float = 0.0, y:Float = 0.0, image:Image, ?sizeX:Int, ?sizeY:Int):Sprite {
+        final sprite = new Sprite(x, y, image, sizeX, sizeY);
+        entities.push(sprite);
+        return sprite;
+    }
+
+    public inline function makeAnim (num:Int):Family<FrameAnim> {
+        final f = new Family<FrameAnim>();
+        for (i in 0...num) {
+            f.items.push(new FrameAnim());
+        }
+        return f;
+    }
+
+    public function destroy () {
+        destroyed = true;
+    }
+}
