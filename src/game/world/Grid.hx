@@ -68,3 +68,11 @@ function mapGIItems<T, TT> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> TT)
     }
     return items;
 }
+
+function getGridItem<T> (grid:Grid<T>, x:Int, y:Int):Null<T> {
+    if (x < 0 || y < 0 || x >= grid.width || y >= grid.height) {
+        return null;
+    }
+
+    return grid.items[x + y * grid.width];
+}

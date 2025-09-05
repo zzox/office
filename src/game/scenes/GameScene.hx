@@ -18,8 +18,6 @@ class GameScene extends Scene {
     }
 
     override function update (delta:Float) {
-        world.step();
-
         if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
             camera.scale /= 2.0;
         }
@@ -41,6 +39,8 @@ class GameScene extends Scene {
         if (Game.keys.pressed(KeyCode.Down)) {
             camera.scrollY += num;
         }
+
+        world.step();
 
         super.update(delta);
     }
