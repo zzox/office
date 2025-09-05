@@ -40,7 +40,18 @@ class GameScene extends Scene {
             camera.scrollY += num;
         }
 
-        world.step();
+        var steps = 1;
+        if (Game.keys.pressed(KeyCode.H)) {
+            steps += 15;
+        } else if (Game.keys.pressed(KeyCode.G)) {
+            steps += 7;
+        } else if (Game.keys.pressed(KeyCode.F)) {
+            steps += 3;
+        }
+
+        for (_ in 0...steps) {
+            world.step();
+        }
 
         super.update(delta);
     }

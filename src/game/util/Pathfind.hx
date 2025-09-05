@@ -7,10 +7,10 @@ import game.world.Grid;
 typedef Heuristic = (p1: IntVec2, p2: IntVec2) -> Float;
 
 // WARN: a static class like this needs to be safe, multiple pathfinds at once
-// coould cause issues
+// could cause issues. also requires us recycling these items
 class Points {
-    public static var items:Array<IntVec2> = [];
     public static var index:Int = 0;
+    public static var items:Array<IntVec2> = [];
     public static function getItem(x:Int, y:Int):IntVec2 {
         final item = items[index];
         if (item != null) {
@@ -20,9 +20,8 @@ class Points {
         }
 
         index++;
-
-        items[index] = new IntVec2(x, y);
-        return items[index];
+        items.push(new IntVec2(x, y));
+        return items[index - 1];
     }
 
     public static function makeItems () {}
@@ -119,31 +118,31 @@ function getNeighbors (grid:Grid<Int>, point:IntVec2, target:IntVec2, canGoDiago
 
     // N, S, E, W
     if (checkCanMoveTo(grid, point.x, point.y - 1, target.x, target.y)) {
-        neighbors.push(new IntVec2(point.x, point.y - 1));
+        neighbors.push(Points.getItem(point.x, point.y - 1));
     }
     if (checkCanMoveTo(grid, point.x, point.y + 1, target.x, target.y)) {
-        neighbors.push(new IntVec2(point.x, point.y + 1));
+        neighbors.push(Points.getItem(point.x, point.y + 1));
     }
     if (checkCanMoveTo(grid, point.x + 1, point.y, target.x, target.y)) {
-        neighbors.push(new IntVec2(point.x + 1, point.y));
+        neighbors.push(Points.getItem(point.x + 1, point.y));
     }
     if (checkCanMoveTo(grid, point.x - 1, point.y, target.x, target.y)) {
-        neighbors.push(new IntVec2(point.x - 1, point.y));
+        neighbors.push(Points.getItem(point.x - 1, point.y));
     }
 
     // NE, SE, NW, SW
     if (canGoDiagonal) {
         if (checkCanMoveTo(grid, point.x + 1, point.y - 1, target.x, target.y)) {
-            neighbors.push(new IntVec2(point.x + 1, point.y - 1));
+            neighbors.push(Points.getItem(point.x + 1, point.y - 1));
         }
         if (checkCanMoveTo(grid, point.x + 1, point.y + 1, target.x, target.y)) {
-            neighbors.push(new IntVec2(point.x + 1, point.y + 1));
+            neighbors.push(Points.getItem(point.x + 1, point.y + 1));
         }
         if (checkCanMoveTo(grid, point.x - 1, point.y - 1, target.x, target.y)) {
-            neighbors.push(new IntVec2(point.x - 1, point.y - 1));
+            neighbors.push(Points.getItem(point.x - 1, point.y - 1));
         }
         if (checkCanMoveTo(grid, point.x - 1, point.y + 1, target.x, target.y)) {
-            neighbors.push(new IntVec2(point.x - 1, point.y + 1));
+            neighbors.push(Points.getItem(point.x - 1, point.y + 1));
         }
     }
 
@@ -172,7 +171,7 @@ function pathfind (
 
     final visited = new HashSet(grid.width);
 
-    // Points.index = 0;
+    Points.index = 0;
 
     // our heap of possible selections
     final heap = new Heap();
