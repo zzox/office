@@ -9,8 +9,8 @@ import core.util.Util;
 class Camera extends System {
     public var bgColor:Int = 0xff000000;
 
-    public var scrollX:Float;
-    public var scrollY:Float;
+    public var scrollX:Float = 0.0;
+    public var scrollY:Float = 0.0;
     public var width:Int;
     public var height:Int;
 
@@ -40,19 +40,21 @@ class Camera extends System {
     override function update (delta:Float) {
         if (followX != null) {
             scrollX = lerp(followX.getMiddleX() - width / 2, scrollX, lerpX);
-            // scrollX = Math.floor(scrollX);
+            // TEMP: wont work with lerp
+            scrollX = Math.floor(scrollX);
         }
 
         if (followY != null) {
             scrollY = lerp(followY.getMiddleY() - height / 2, scrollY, lerpY);
-            // scrollY = Math.floor(scrollY);
+            // TEMP: wont work with lerp
+            scrollY = Math.floor(scrollY);
         }
 
-        scrollX = clamp(scrollX, boundsMinX, boundsMaxX - width);
-        scrollY = clamp(scrollY, boundsMinY, boundsMaxY - height);
+        scrollX = clamp(scrollX - offsetX, boundsMinX, boundsMaxX - width);
+        scrollY = clamp(scrollY - offsetY, boundsMinY, boundsMaxY - height);
     }
 
-    public function startFollow (sprite:GameObject, offsetX:Int = 0, offsetY:Int = 0, lerpX:Float = 0, lerpY:Float = 0) {
+    public function startFollow (sprite:GameObject, offsetX:Int = 0, offsetY:Int = 0, lerpX:Float = 1.0, lerpY:Float = 1.0) {
         followX = sprite;
         followY = sprite;
 

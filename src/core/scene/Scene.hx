@@ -15,6 +15,8 @@ class Scene /* implements Destroyable */ {
 
     public var camera:Camera;
 
+    public var game:Game;
+
     public function new () {}
 
     public function create () {}
@@ -52,10 +54,9 @@ class Scene /* implements Destroyable */ {
     }
 
     public inline function makeAnim (num:Int):Family<FrameAnim> {
-        final f = new Family<FrameAnim>();
-        for (i in 0...num) {
-            f.items.push(new FrameAnim());
-        }
+        final f = new Family<FrameAnim>((n:Int) -> {
+            return [for (i in 0...n) new FrameAnim()];
+        }, num);
         return f;
     }
 

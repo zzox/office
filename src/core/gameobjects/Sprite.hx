@@ -1,6 +1,7 @@
 package core.gameobjects;
 
 import core.components.FrameAnim;
+import core.components.PhysicsBody;
 import core.system.Camera;
 import kha.Image;
 import kha.graphics2.Graphics;
@@ -14,7 +15,8 @@ class Sprite extends GameObject {
 
     public var image:Image;
 
-    public var anim:FrameAnim;
+    public var anim:Null<FrameAnim>;
+    public var body:Null<PhysicsBody>;
 
     var animIndex:Int = -1;
 
@@ -26,8 +28,9 @@ class Sprite extends GameObject {
         this.image = image;
     }
 
-    public function init (?anim:FrameAnim/*, ?physics:FrameAnim*/) {
+    public function init (?anim:FrameAnim, ?body:PhysicsBody) {
         this.anim = anim;
+        this.body = body;
 
         if (anim != null) {
             anim.sprite = this;

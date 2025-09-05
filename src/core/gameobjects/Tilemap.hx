@@ -16,10 +16,10 @@ class Tilemap extends GameObject {
             if (tileNum >= 0) {
                 image.g2.drawSubImage(
                     tileImage,
-                    Math.floor(i % width) * tileWidth,
+                    (i % width) * tileWidth,
                     Math.floor(i / width) * tileHeight,
-                    Math.floor(tileNum * tileWidth % tileImage.width),
-                    Math.floor(tileNum * tileHeight / tileImage.height),
+                    (tileNum % Math.floor(tileImage.width / tileWidth)) * tileHeight,
+                    Math.floor(tileNum / Math.floor(tileImage.width / tileWidth)) * tileWidth,
                     tileWidth,
                     tileHeight
                 );

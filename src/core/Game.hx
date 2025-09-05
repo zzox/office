@@ -83,11 +83,14 @@ class Game {
                     System.notifyOnFrames((frames) -> { render(frames[0]); });
                 }
 
-                addScene(new PreloadScene());
+                final preloadScene = new PreloadScene();
+                addScene(preloadScene);
 
                 // WARN: these can run out of order if there's nothing being loaded!
                 // (Game will get stuck on Preload screen)
                 Assets.loadEverything(() -> {
+                    // HACK: force destroy preload scene to address above warning
+                    preloadScene.destroy();
                     changeScene(initialScene);
                 });
             }, (item) -> {
@@ -213,7 +216,7 @@ class Game {
 
     public function addScene (scene:Scene) {
         newScenes.push(scene);
-        // scene.game = this;
+        scene.game = this;
         scene.camera = new Camera(bufferWidth > -1 ? bufferWidth : width, bufferHeight > -1 ? bufferHeight : height);
         scene.create();
     }

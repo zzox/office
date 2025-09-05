@@ -70,9 +70,12 @@ class World {
         time++;
 
         for (a in actors) {
+            // increase/decrease timers
             if (a.arriveTime == this.time) {
                 trace('arrive');
             }
+            // decide next action/state if we are done with a state
+            // do the action
         }
     }
 
