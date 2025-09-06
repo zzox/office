@@ -23,6 +23,7 @@ class BitmapText extends GameObject {
 
     override function render (g2:Graphics, camera:Camera) {
         g2.pushTranslation(-camera.scrollX * scrollFactorX, -camera.scrollY * scrollFactorY);
+        g2.pushScale(camera.scale, camera.scale);
 
         final lineHeight = font.getFontData().lineHeight;
         var scrollPos:Int = 0;
@@ -52,5 +53,11 @@ class BitmapText extends GameObject {
         textWidth = scrollPos;
 
         g2.popTransformation();
+        g2.popTransformation();
+    }
+
+    public function setText (text:String) {
+        this.text = text;
+        textWidth = font.getTextWidth(text);
     }
 }

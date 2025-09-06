@@ -1,20 +1,31 @@
 package game.scenes;
 
 import core.Game;
+import core.gameobjects.BitmapText;
 import core.scene.Scene;
+import core.system.Camera;
+import game.ui.UiText;
+import game.util.TextUtil;
 import game.world.Grid;
 import game.world.World;
 import haxe.ds.ArraySort;
 import kha.Assets;
+import kha.graphics2.Graphics;
 import kha.input.KeyCode;
 
 class GameScene extends Scene {
     var world:World;
 
+    var timeText:BitmapText;
+
     override function create () {
         super.create();
 
         world = new World();
+
+        new UiText();
+
+        entities.push(timeText = makeBitmapText(4, 4, ''));
     }
 
     override function update (delta:Float) {
@@ -53,12 +64,12 @@ class GameScene extends Scene {
             world.step();
         }
 
+        timeText.setText(TextUtil.formatTime(world.time));
+
         super.update(delta);
     }
 
-    override function render (g2, cam) {
-        super.render(g2, cam);
-
+    override function render (g2:Graphics, clears:Bool) {
         // PERF: only do this on rotation instead of on every frame, preferably
         // rendering to a single image
         final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
@@ -82,5 +93,7 @@ class GameScene extends Scene {
         g2.popTransformation();
 
         g2.end();
+
+        super.render(g2, false);
     }
 }

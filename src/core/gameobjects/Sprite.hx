@@ -40,7 +40,9 @@ class Sprite extends GameObject {
     override function update (delta:Float) {}
 
     override function render (g2:Graphics, camera:Camera) {
+        // TODO: move these to inlined pre and post render?
         g2.pushTranslation(-camera.scrollX * scrollFactorX, -camera.scrollY * scrollFactorY);
+        g2.pushScale(camera.scale, camera.scale);
 
         // draw a cutout of the spritesheet based on the tileindex
         final cols = Std.int(image.width / sizeX);
@@ -56,6 +58,7 @@ class Sprite extends GameObject {
             sizeY * (flipY ? -1 : 1)
         );
 
+        g2.popTransformation();
         g2.popTransformation();
     }
 }
