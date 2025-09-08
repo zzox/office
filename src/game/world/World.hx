@@ -21,9 +21,9 @@ enum ActorGoal {
 }
 
 enum ActorLocation {
-  PreWork;
-  AtWork;
-  PostWork;
+    PreWork;
+    AtWork;
+    PostWork;
 }
 
 enum TileItem {
@@ -149,7 +149,10 @@ class World {
             if (a.stateTime == 0) {
                 if (a.arriveTime + Time.hours(8) > time && time > Time.FIVE_PM) {
                     goHome(a);
+                    break;
                 }
+
+
             }
 
 #if debug
@@ -196,19 +199,34 @@ class World {
             }
         }
 
-        final item = actor.path.shift();
-        if (item != null) {
-            actor.move = {
-                fromX: actor.getX(),
-                fromY: actor.getY(),
-                toX: item.x,
-                toY: item.y,
-                elapsed: 0,
-                time: Math.round(100000 / actor.speed)
+        if (actor.path[0] != null) {
+            if (!checkCollision(actor.path[0].x, actor.path[0].y)) {
+                final item = actor.path.shift();
+                actor.move = {
+                    fromX: actor.getX(),
+                    fromY: actor.getY(),
+                    toX: item.x,
+                    toY: item.y,
+                    elapsed: 0,
+                    time: Math.round(100000 / actor.speed)
+                }
+            } else {
+                actor.state = Wait;
             }
         } else {
             actor.state = Wait;
         }
+    }
+
+    // returns true if there is a collision at this position
+    function checkCollision (x:Int, y:Int):Bool {
+        for (i in 0...actors.length) {
+            if (actors[i].getX() == x && actors[i].getY() == y) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function goHome (actor:Actor) {

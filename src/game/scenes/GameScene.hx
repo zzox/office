@@ -17,6 +17,8 @@ class GameScene extends Scene {
 
     var timeText:BitmapText;
 
+    var zoom:Int = 0;
+
     override function create () {
         super.create();
 
@@ -29,11 +31,11 @@ class GameScene extends Scene {
 
     override function update (delta:Float) {
         if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
-            camera.scale /= 2.0;
+            zoomOut();
         }
 
         if (Game.keys.justPressed(KeyCode.Equals)) {
-            camera.scale *= 2.0;
+            zoomIn();
         }
 
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
@@ -98,5 +100,33 @@ class GameScene extends Scene {
         g2.end();
 
         super.render(g2, false);
+    }
+
+    public function zoomIn () {
+        zoom++;
+        if (zoom > 3) {
+            zoom = 3;
+            return;
+        }
+
+        final scale = Math.pow(2, zoom);
+
+        camera.scale = scale;
+        camera.scrollX += (1 / camera.scale) * (camera.width / 2);
+        camera.scrollY += (1 / camera.scale) * (camera.height / 2);
+    }
+
+    public function zoomOut () {
+        zoom--;
+        if (zoom < 0) {
+            zoom = 0;
+            return;
+        }
+
+        final scale = Math.pow(2, zoom);
+
+        camera.scrollX -= (1 / camera.scale) * (camera.width / 2);
+        camera.scrollY -= (1 / camera.scale) * (camera.height / 2);
+        camera.scale = scale;
     }
 }
