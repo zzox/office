@@ -3,7 +3,6 @@ package game.scenes;
 import core.Game;
 import core.gameobjects.BitmapText;
 import core.scene.Scene;
-import core.system.Camera;
 import game.ui.UiText;
 import game.util.TextUtil;
 import game.world.Grid;
@@ -87,6 +86,10 @@ class GameScene extends Scene {
             g2.drawSubImage(Assets.images.tiles, translateWorldX(items[i].x, items[i].y, SouthEast), translateWorldY(items[i].x, items[i].y, SouthEast),
                 0, 0, 16, 16
             );
+        }
+
+        for (i in 0...world.actors.length) {
+            g2.drawImage(Assets.images.char_test, translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast), translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast));
         }
 
         g2.popTransformation();
