@@ -1,10 +1,8 @@
 package game.scenes;
 
 import core.Game;
-import core.gameobjects.BitmapText;
 import core.scene.Scene;
 import game.ui.UiText;
-import game.util.TextUtil;
 import game.world.Grid;
 import game.world.World;
 import haxe.ds.ArraySort;
@@ -14,30 +12,23 @@ import kha.input.KeyCode;
 
 class GameScene extends Scene {
     var world:World;
-
-    var timeText:BitmapText;
-
-    var zoom:Int = 0;
+    var uiScene:UiScene;
+    var zoom:Int = 1;
 
     override function create () {
         super.create();
 
-        world = new World();
-
+        // WARN: should go in first scene in the game to initialize these items
         new UiText();
 
-        entities.push(timeText = makeBitmapText(4, 4, ''));
+        world = new World();
+
+        uiScene = new UiScene(world);
+
+        game.addScene(uiScene);
     }
 
     override function update (delta:Float) {
-        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
-            zoomOut();
-        }
-
-        if (Game.keys.justPressed(KeyCode.Equals)) {
-            zoomIn();
-        }
-
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
         if (Game.keys.pressed(KeyCode.Left)) {
             camera.scrollX -= num;
@@ -61,11 +52,17 @@ class GameScene extends Scene {
             steps += 3;
         }
 
+        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
+            zoomOut();
+        }
+
+        if (Game.keys.justPressed(KeyCode.Equals)) {
+            zoomIn();
+        }
+
         for (_ in 0...steps) {
             world.step();
         }
-
-        timeText.setText(TextUtil.formatTime(world.time));
 
         super.update(delta);
     }
