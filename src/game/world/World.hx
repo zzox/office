@@ -6,27 +6,6 @@ import game.util.Pathfind;
 import game.util.TimeUtil as Time;
 import game.world.Grid;
 
-enum ActorState {
-    Wait;
-    Sell;
-    Break;
-    Talk;
-    Think;
-    Move;
-}
-
-enum ActorGoal {
-    Work;
-    Break;
-    Home;
-}
-
-enum ActorLocation {
-    PreWork;
-    AtWork;
-    PostWork;
-}
-
 enum TileItem {
     Entrance;
     Exit;
@@ -43,60 +22,8 @@ typedef Event = {
     var actor:Actor;
 }
 
-typedef Move = {
-    var fromX:Int;
-    var fromY:Int;
-    var toX:Int;
-    var toY:Int;
-    var time:Int;
-    var elapsed:Int;
-}
-
 function calcPosition (moveFrom:Int, moveTo:Int, percentMoved:Float):Float {
     return moveFrom + (moveTo - moveFrom) * percentMoved;
-}
-
-class Actor {
-    public static var curId:Int = 0;
-    // static vals
-    public final id:Int;
-    public final name:String;
-
-    // 0-10000 stats
-    public final speed:Int = 5000; // 20 frames a square
-
-    // dynamic vals
-    public var x:Float = -16.0;
-    public var y:Float = -16.0;
-    public var state:Null<ActorState>;
-    public var stateTime:Int = 0;
-    public var move:Null<Move>;
-    public var path:Array<IntVec2> = [];
-
-    public var location:ActorLocation = PreWork;
-
-    public var arriveTime:Int;
-    
-    public function new (name:String) {
-        this.name = name;
-        id = curId++;
-        speed = 4000 + Math.floor(Math.random() * 6000);
-    }
-
-    public function startDay () {
-        // reset daily values
-
-        arriveTime = Math.floor(Time.hours(3) + Math.random() * Time.hours(2));
-    }
-
-    public inline function getX ():Int {
-        if (move == null) return Std.int(x);
-        return move.toX;
-    }
-    public inline function getY ():Int {
-        if (move == null) return Std.int(y);
-        return move.toY;
-    }
 }
 
 class World {
@@ -133,7 +60,7 @@ class World {
             if (a.location == PreWork) {
                 if (a.arriveTime == this.time) {
                     arrive(a);
-                    tryMoveActor(a);
+                    tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
                 }
             }
 
@@ -152,18 +79,28 @@ class World {
             a.stateTime--;
 
             if (a.stateTime == 0) {
-                if (a.arriveTime + Time.hours(8) > time && time > Time.FIVE_PM) {
+                if (time > a.arriveTime + Time.hours(8) && time > Time.FIVE_PM) {
                     goHome(a);
-                    break;
                 }
 
+                // what do we do when we're done with our task?
                 if (a.state == Wait) {
-                    tryMoveActor(a);
+                    if (a.goal == Leave) {
+                        if (a.isAt(exit.x, exit.y)) {
+                            leave(a);
+                            continue;
+                        }
+
+                        tryMoveActor(a, exit.x, exit.y);
+                    } else {
+                        tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
+                    }
                 }
             }
 
 #if world_debug
             if (a.stateTime < 0) {
+                trace(a.name, a.state, a.stateTime, a.goal);
                 throw 'Illegal `stateTime`';
             }
 #end
@@ -190,16 +127,26 @@ class World {
         actor.y = entrance.y;
     }
 
-    function tryMoveActor (actor:Actor) {
+    function leave (actor:Actor) {
+        actor.location = PostWork;
+        actor.state = Wait;
+        actor.x = -16;
+        actor.y = -16;
+    }
+
+    function tryMoveActor (actor:Actor, x:Int, y:Int) {
 #if world_debug
         if (actor.getX() % 1.0 != 0.0 || actor.getY() % 1.0 != 0.0) {
             throw 'Should not move from uneven spots';
         }
 #end
-        final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(actor.getX(), actor.getY()), new IntVec2(randomInt(grid.width), randomInt(grid.height)), Manhattan);
+        final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(actor.getX(), actor.getY()), new IntVec2(x, y), Manhattan);
         if (path != null) {
             actor.path = clonePath(path);
             actor.state = Move;
+        } else {
+            // TODO: remove
+            trace('could not find path');
         }
     }
 
@@ -207,7 +154,7 @@ class World {
         return [for (p in path) new IntVec2(p.x, p.y)];
     }
 
-    function handleCurrentMove (actor:Actor) {
+    inline function handleCurrentMove (actor:Actor) {
         if (actor.move != null) {
             actor.move.elapsed++;
             actor.x = calcPosition(actor.move.fromX, actor.move.toX, actor.move.elapsed / actor.move.time);
@@ -256,7 +203,7 @@ class World {
     }
 
     inline function goHome (actor:Actor) {
-        trace('going home!');
+        actor.goal = Leave;
     }
 
     inline function addEvent (type:EventType, actor:Actor) {

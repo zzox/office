@@ -54,7 +54,9 @@ class GameScene extends Scene {
         }
 
         var steps = 1;
-        if (Game.keys.pressed(KeyCode.H)) {
+        if (Game.keys.pressed(KeyCode.J)) {
+            steps += 64;
+        } else if (Game.keys.pressed(KeyCode.H)) {
             steps += 15;
         } else if (Game.keys.pressed(KeyCode.G)) {
             steps += 7;
