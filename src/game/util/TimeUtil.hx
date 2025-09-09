@@ -1,8 +1,8 @@
 package game.util;
 
 class TimeUtil {
-    // steps for one hour
-    public static inline final ONE_HOUR:Int = 60 * 60;
+    // steps for one hour, or twenty steps is a minute
+    public static inline final ONE_HOUR:Int = 60 * 20;
     // 5am-9pm is one day
     public static inline final ONE_DAY:Int = ONE_HOUR * 16;
     

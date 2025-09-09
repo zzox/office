@@ -52,9 +52,12 @@ class TextUtil {
     }
 
     public static inline function formatTime (time:Int) {
-        final minutes = Math.floor(time / 60) % 60;
-        var hours = Math.floor(time / 3600);
+        final minutes = Math.floor(time / 20) % 60;
+        var hours = Math.floor(time / TimeUtil.ONE_HOUR);
 
+        final roundedMinutes = Math.floor(minutes / 5) * 5;
+
+        // start time is 5am, `time` val of zero equals 5 am
         hours += 5;
 
         var ampm = 'AM';
@@ -66,6 +69,6 @@ class TextUtil {
             hours -= 12;
         }
 
-        return '${padInt(hours)}:${padInt(minutes)} ${ampm}';
+        return '${padInt(hours)}:${padInt(roundedMinutes)} ${ampm}';
     }
 }
