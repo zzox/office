@@ -7,13 +7,21 @@ import game.world.Grid;
 import game.world.World;
 import haxe.ds.ArraySort;
 import kha.Assets;
+import kha.Image;
 import kha.graphics2.Graphics;
 import kha.input.KeyCode;
+
+final TILE_WIDTH = 16;
+final TILE_HEIGHT = 8;
 
 class GameScene extends Scene {
     var world:World;
     var uiScene:UiScene;
     var zoom:Int = 1;
+    var tilemap:Image;
+
+    var minX:Int = 0;
+    var minY:Int = 0;
 
     override function create () {
         super.create();
@@ -26,6 +34,8 @@ class GameScene extends Scene {
         uiScene = new UiScene(world);
 
         game.addScene(uiScene);
+
+        makeTilemap();
     }
 
     override function update (delta:Float) {
@@ -67,12 +77,40 @@ class GameScene extends Scene {
         super.update(delta);
     }
 
-    override function render (g2:Graphics, clears:Bool) {
-        // PERF: only do this on rotation instead of on every frame, preferably
-        // rendering to a single image
+    function makeTilemap () {
         final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
         ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast)));
 
+        // there's a more mathematical way to do this, but looping through all works
+        minX = 0;
+        minY = 0;
+        var maxX = 0;
+        var maxY = 0;
+        for (i in items) {
+            minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
+            minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
+            maxX = Std.int(Math.max(translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH, maxX));
+            maxY = Std.int(Math.max(translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH, maxY));
+        }
+
+        tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
+
+        tilemap.g2.begin(true, 0x00000000);
+
+        for (i in 0...items.length) {
+            tilemap.g2.drawSubImage(Assets.images.tiles,
+                translateWorldX(items[i].x, items[i].y, SouthEast) - minX,
+                translateWorldY(items[i].x, items[i].y, SouthEast) - minY,
+                0, 0, 16, 16
+            );
+        }
+
+        tilemap.g2.end();
+    }
+
+    override function render (g2:Graphics, clears:Bool) {
+        // PERF: only do this on rotation instead of on every frame, preferably
+        // rendering to a single image
         g2.begin(true, camera.bgColor);
 
         // g2.color = Math.floor(alpha * 256) * 0x1000000 + color;
@@ -81,14 +119,10 @@ class GameScene extends Scene {
         g2.pushTranslation(-camera.scrollX, -camera.scrollY);
         g2.pushScale(camera.scale, camera.scale);
 
-        for (i in 0...items.length) {
-            g2.drawSubImage(Assets.images.tiles, translateWorldX(items[i].x, items[i].y, SouthEast), translateWorldY(items[i].x, items[i].y, SouthEast),
-                0, 0, 16, 16
-            );
-        }
+        g2.drawImage(tilemap, 0, 0);
 
         for (i in 0...world.actors.length) {
-            g2.drawImage(Assets.images.char_test, translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast), translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast));
+            g2.drawImage(Assets.images.char_test, translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX, translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY);
         }
 
         g2.popTransformation();
