@@ -14,6 +14,7 @@ project.addAssets('assets/index.html');
 
 project.addShaders('shaders/**');
 project.addSources('src');
+project.addDefine('world_debug');
 // project.addDefine('debug_physics');
 // project.addDefine('is_ng');
 // project.addLibrary('newgrounds');

@@ -121,8 +121,15 @@ class GameScene extends Scene {
 
         g2.drawImage(tilemap, 0, 0);
 
+        final charXDiff = 8;
+        final charYDiff = 24;
+
         for (i in 0...world.actors.length) {
-            g2.drawImage(Assets.images.char_test, translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX, translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY);
+            g2.drawImage(
+                Assets.images.char_test,
+                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
+                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff
+            );
         }
 
         g2.popTransformation();

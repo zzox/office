@@ -1,6 +1,7 @@
 package game.world;
 
 import core.Types.IntVec2;
+import core.util.Util;
 import game.util.Pathfind;
 import game.util.TimeUtil as Time;
 import game.world.Grid;
@@ -62,7 +63,7 @@ class Actor {
     public final name:String;
 
     // 0-10000 stats
-    public final speed:Int = 5000; // 10 frames a square
+    public final speed:Int = 5000; // 20 frames a square
 
     // dynamic vals
     public var x:Float = -16.0;
@@ -79,6 +80,7 @@ class Actor {
     public function new (name:String) {
         this.name = name;
         id = curId++;
+        speed = 4000 + Math.floor(Math.random() * 6000);
     }
 
     public function startDay () {
@@ -104,12 +106,18 @@ class World {
 
     public var tiles:Grid<TileItem>;
 
+    var entrance:IntVec2;
+    var exit:IntVec2;
+
     public var time:Int;
     public var day:Int = -1;
 
     public var events:Array<Event> = [];
 
     public function new () {
+        entrance = new IntVec2(12, 0);
+        exit = new IntVec2(14, 0);
+
         grid = makeGrid(25, 25, 0);
         for (_ in 0...3) {
             actors.push(new Actor('test${Actor.curId}'));
@@ -124,10 +132,7 @@ class World {
         for (a in actors) {
             if (a.location == PreWork) {
                 if (a.arriveTime == this.time) {
-                    // trace('arrive');
-                       a.location = AtWork;
-                    // a.stateTime = 0;
-
+                    arrive(a);
                     tryMoveActor(a);
                 }
             }
@@ -152,13 +157,15 @@ class World {
                     break;
                 }
 
-
+                if (a.state == Wait) {
+                    tryMoveActor(a);
+                }
             }
 
-#if debug
-            // if (a.stateTime < 0) {
-            //     throw 'Illegal `stateTime`';
-            // }
+#if world_debug
+            if (a.stateTime < 0) {
+                throw 'Illegal `stateTime`';
+            }
 #end
         }
 
@@ -177,8 +184,19 @@ class World {
         }
     }
 
+    function arrive (actor:Actor) {
+        actor.location = AtWork;
+        actor.x = entrance.x;
+        actor.y = entrance.y;
+    }
+
     function tryMoveActor (actor:Actor) {
-        final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(12, 0), new IntVec2(16, 18), Manhattan);
+#if world_debug
+        if (actor.getX() % 1.0 != 0.0 || actor.getY() % 1.0 != 0.0) {
+            throw 'Should not move from uneven spots';
+        }
+#end
+        final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(actor.getX(), actor.getY()), new IntVec2(randomInt(grid.width), randomInt(grid.height)), Manhattan);
         if (path != null) {
             actor.path = clonePath(path);
             actor.state = Move;
@@ -192,12 +210,15 @@ class World {
     function handleCurrentMove (actor:Actor) {
         if (actor.move != null) {
             actor.move.elapsed++;
-            actor.x = calcPosition(actor.move.toX, actor.move.fromX, actor.move.elapsed / actor.move.time);
-            actor.y = calcPosition(actor.move.toY, actor.move.fromY, actor.move.elapsed / actor.move.time);
+            actor.x = calcPosition(actor.move.fromX, actor.move.toX, actor.move.elapsed / actor.move.time);
+            actor.y = calcPosition(actor.move.fromY, actor.move.toY, actor.move.elapsed / actor.move.time);
             if (actor.move.elapsed == actor.move.time) {
                 actor.move = null;
             }
         }
+
+        // skip collision/state checks if the move is still going
+        if (actor.move != null) return;
 
         if (actor.path[0] != null) {
             if (!checkCollision(actor.path[0].x, actor.path[0].y)) {
@@ -211,10 +232,10 @@ class World {
                     time: Math.round(100000 / actor.speed)
                 }
             } else {
-                actor.state = Wait;
+                wait(actor, Time.MINUTE);
             }
         } else {
-            actor.state = Wait;
+            wait(actor, 1);
         }
     }
 
@@ -229,11 +250,16 @@ class World {
         return false;
     }
 
-    function goHome (actor:Actor) {
+    inline function wait (actor:Actor, time:Int) {
+        actor.state = Wait;
+        actor.stateTime = time;
+    }
+
+    inline function goHome (actor:Actor) {
         trace('going home!');
     }
 
-    function addEvent (type:EventType, actor:Actor) {
+    inline function addEvent (type:EventType, actor:Actor) {
         events.push({ type: type, actor: actor });
     }
 
