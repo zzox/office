@@ -12,6 +12,10 @@ class TimeUtil {
     public static inline final FIVE_PM:Int = ONE_HOUR * 12;
     public static inline final NOON:Int = ONE_HOUR * 7;
 
+    // other hour stuff
+    public static inline final HALF_HOUR:Int = MINUTE * 30;
+    public static inline final QTR_HOUR:Int = MINUTE * 15;
+
     public static function hours (hours:Int) {
         return hours * ONE_HOUR;
     }

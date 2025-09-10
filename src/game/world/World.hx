@@ -28,9 +28,7 @@ function calcPosition (moveFrom:Int, moveTo:Int, percentMoved:Float):Float {
 
 class World {
     public var grid:Grid<Int>;
-
     public var actors:Array<Actor> = [];
-
     public var tiles:Grid<TileItem>;
 
     var entrance:IntVec2;
@@ -51,7 +49,7 @@ class World {
         }
     }
 
-    public function step () {
+    public function step ():Bool {
         time++;
 
         // check to see if an actor has arrived
@@ -118,19 +116,14 @@ class World {
 #end
         }
 
-            // decide next action/state if we are done with a state
-            // do the action
-    }
+        // decide next action/state if we are done with a state
+        // do the action
 
-    public function newDay () {
-        day++;
-        // TEMP: start at 8 AM (time starts at 5 am)
-        time = Time.hours(3);
+        final actorsPresent = Lambda.fold(actors, (actor:Actor, res:Int) -> {
+            return res + (actor.location == AtWork ? 1 : 0);
+        }, 0);
 
-        // reset daily values
-        for (a in actors) {
-            a.startDay();
-        }
+        return !(time > Time.FIVE_PM && actorsPresent == 0);
     }
 
     function arrive (actor:Actor) {
@@ -235,5 +228,19 @@ class World {
         final rEvents = events.copy();
         events.resize(0);
         return rEvents;
+    }
+
+    public function newDay () {
+        day++;
+
+        time = Time.hours(3) + Time.HALF_HOUR;
+
+        // reset daily values
+        for (a in actors) {
+            a.startDay();
+            if (a.arriveTime < time) {
+                time = a.arriveTime - Time.QTR_HOUR;
+            }
+        }
     }
 }

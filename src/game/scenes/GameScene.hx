@@ -77,7 +77,13 @@ class GameScene extends Scene {
 
         if (worldActive) {
             for (_ in 0...steps) {
-                world.step();
+                worldActive = world.step();
+                // break needed?
+                // if (!worldActive) break;
+            }
+
+            if (!worldActive) {
+                dayOver();
             }
         }
 
@@ -120,6 +126,10 @@ class GameScene extends Scene {
         worldActive = true;
         world.newDay();
         uiScene.setMiddleText('Day ${world.day + 1}', 3.0);
+    }
+
+    function dayOver () {
+        startDay();
     }
 
     function makeTilemap () {

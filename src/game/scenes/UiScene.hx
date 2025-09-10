@@ -31,16 +31,13 @@ class UiScene extends Scene {
         super.update(delta);
 
         timeText.setText(TextUtil.formatTime(world.time));
-        // middleTextTime -= delta;
+        middleTextTime -= delta;
         middleText.setPosition(Math.floor(((camera.width - middleText.textWidth) / 2) / 2), middleText.y);
-        // middleText.visible = middleTextTime > 0;
+        middleText.visible = middleTextTime > 0;
     }
 
     public function setMiddleText (text:String, time:Float) {
         middleText.setText(text);
-        // middleTextTime = time;
-        timers.addTimer(time, () -> {
-            middleText.visible = false;
-        });
+        middleTextTime = time;
     }
 }

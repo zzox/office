@@ -48,7 +48,7 @@ class Actor {
     // dynamic vals
     public var x:Float = -16.0;
     public var y:Float = -16.0;
-    public var state:ActorState = Wait;
+    public var state:ActorState = None;
     public var stateTime:Int = 0;
     public var move:Null<Move>;
     public var path:Array<IntVec2> = [];
@@ -66,7 +66,9 @@ class Actor {
 
     public function startDay () {
         // reset daily values
-        state = Wait;
+        state = None;
+        location = PreWork;
+        goal = Work;
         arriveTime = Math.floor(Time.hours(3) + Math.random() * Time.hours(2));
     }
 
