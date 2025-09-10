@@ -3,9 +3,8 @@ package game.world;
 import core.Types;
 import game.util.TimeUtil as Time;
 
-// TODO: split wait up with a temp state?
 enum ActorState {
-    // None;
+    None;
     Wait;
     Move;
     Sell;

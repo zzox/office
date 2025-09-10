@@ -75,6 +75,7 @@ class World {
         }
 
         for (a in actors) {
+            // if we're moving or not at work, don't do anything
             if (a.location != AtWork || a.state == Move) continue;
             a.stateTime--;
 
@@ -84,13 +85,21 @@ class World {
                 }
 
                 // what do we do when we're done with our task?
-                if (a.state == Wait) {
+                if (a.state == None) {
                     if (a.goal == Leave) {
                         if (a.isAt(exit.x, exit.y)) {
                             leave(a);
                             continue;
                         }
 
+                        tryMoveActor(a, exit.x, exit.y);
+                    } else {
+                        trace('here');
+                        tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
+                    }
+                } else if (a.state == Wait) {
+                    // TODO: DRY
+                    if (a.goal == Leave) {
                         tryMoveActor(a, exit.x, exit.y);
                     } else {
                         tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
@@ -102,6 +111,11 @@ class World {
             if (a.stateTime < 0) {
                 trace(a.name, a.state, a.stateTime, a.goal);
                 throw 'Illegal `stateTime`';
+            }
+
+            if (a.state == None) {
+                trace(a.name, a.state, a.stateTime, a.goal);
+                throw 'Illegal `state`';
             }
 #end
         }
@@ -129,7 +143,7 @@ class World {
 
     function leave (actor:Actor) {
         actor.location = PostWork;
-        actor.state = Wait;
+        actor.state = None;
         actor.x = -16;
         actor.y = -16;
     }
@@ -167,6 +181,9 @@ class World {
         // skip collision/state checks if the move is still going
         if (actor.move != null) return;
 
+        // TODO: check queue here, if anything urgent, we leave
+        // checkQueue();
+
         if (actor.path[0] != null) {
             if (!checkCollision(actor.path[0].x, actor.path[0].y)) {
                 final item = actor.path.shift();
@@ -182,7 +199,7 @@ class World {
                 wait(actor, Time.MINUTE);
             }
         } else {
-            wait(actor, 1);
+            ready(actor);
         }
     }
 
@@ -208,6 +225,12 @@ class World {
 
     inline function addEvent (type:EventType, actor:Actor) {
         events.push({ type: type, actor: actor });
+    }
+
+    // actor is ready for a new state
+    inline function ready (actor:Actor) {
+        actor.state = None;
+        actor.stateTime = 1;
     }
 
     public function getEvents () {
