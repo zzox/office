@@ -49,7 +49,6 @@ class World {
         for (_ in 0...3) {
             actors.push(new Actor('test${Actor.curId}'));
         }
-        newDay();
     }
 
     public function step () {
@@ -94,7 +93,6 @@ class World {
 
                         tryMoveActor(a, exit.x, exit.y);
                     } else {
-                        trace('here');
                         tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
                     }
                 } else if (a.state == Wait) {

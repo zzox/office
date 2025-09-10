@@ -19,6 +19,7 @@ class GameScene extends Scene {
     var uiScene:UiScene;
     var zoom:Int = 1;
     var tilemap:Image;
+    var worldActive:Bool = false;
 
     var minX:Int = 0;
     var minY:Int = 0;
@@ -36,6 +37,8 @@ class GameScene extends Scene {
         game.addScene(uiScene);
 
         makeTilemap();
+
+        startDay();
     }
 
     override function update (delta:Float) {
@@ -72,42 +75,13 @@ class GameScene extends Scene {
             zoomIn();
         }
 
-        for (_ in 0...steps) {
-            world.step();
+        if (worldActive) {
+            for (_ in 0...steps) {
+                world.step();
+            }
         }
 
         super.update(delta);
-    }
-
-    function makeTilemap () {
-        final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
-        ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast)));
-
-        // there's a more mathematical way to do this, but looping through all works
-        minX = 0;
-        minY = 0;
-        var maxX = 0;
-        var maxY = 0;
-        for (i in items) {
-            minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
-            minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
-            maxX = Std.int(Math.max(translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH, maxX));
-            maxY = Std.int(Math.max(translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH, maxY));
-        }
-
-        tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
-
-        tilemap.g2.begin(true, 0x00000000);
-
-        for (i in 0...items.length) {
-            tilemap.g2.drawSubImage(Assets.images.tiles,
-                translateWorldX(items[i].x, items[i].y, SouthEast) - minX,
-                translateWorldY(items[i].x, items[i].y, SouthEast) - minY,
-                0, 0, 16, 16
-            );
-        }
-
-        tilemap.g2.end();
     }
 
     override function render (g2:Graphics, clears:Bool) {
@@ -140,6 +114,43 @@ class GameScene extends Scene {
         g2.end();
 
         super.render(g2, false);
+    }
+
+    function startDay () {
+        worldActive = true;
+        world.newDay();
+        uiScene.setMiddleText('Day ${world.day + 1}', 3.0);
+    }
+
+    function makeTilemap () {
+        final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
+        ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast)));
+
+        // there's a more mathematical way to do this, but looping through all works
+        minX = 0;
+        minY = 0;
+        var maxX = 0;
+        var maxY = 0;
+        for (i in items) {
+            minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
+            minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
+            maxX = Std.int(Math.max(translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH, maxX));
+            maxY = Std.int(Math.max(translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH, maxY));
+        }
+
+        tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
+
+        tilemap.g2.begin(true, 0x00000000);
+
+        for (i in 0...items.length) {
+            tilemap.g2.drawSubImage(Assets.images.tiles,
+                translateWorldX(items[i].x, items[i].y, SouthEast) - minX,
+                translateWorldY(items[i].x, items[i].y, SouthEast) - minY,
+                0, 0, 16, 16
+            );
+        }
+
+        tilemap.g2.end();
     }
 
     public function zoomIn () {
