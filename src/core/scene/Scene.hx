@@ -5,6 +5,7 @@ import core.components.FrameAnim;
 import core.gameobjects.GameObject;
 import core.gameobjects.Sprite;
 import core.system.Camera;
+import core.system.Timers;
 import kha.Image;
 import kha.graphics2.Graphics;
 
@@ -17,11 +18,17 @@ class Scene /* implements Destroyable */ {
 
     public var game:Game;
 
-    public function new () {}
+    public var timers:Timers;
+
+    public function new () {
+        timers = new Timers();
+    }
 
     public function create () {}
 
     public function update (delta:Float) {
+        timers.update(delta);
+
         for (e in entities) {
             if (e.active) e.update(delta);
         }
@@ -55,12 +62,13 @@ class Scene /* implements Destroyable */ {
 
     public inline function makeAnim (num:Int):Family<FrameAnim> {
         final f = new Family<FrameAnim>((n:Int) -> {
-            return [for (i in 0...n) new FrameAnim()];
+            return [for (_ in 0...n) new FrameAnim()];
         }, num);
         return f;
     }
 
     public function destroy () {
         destroyed = true;
+        timers.destroy();
     }
 }
