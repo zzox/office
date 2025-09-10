@@ -8,7 +8,7 @@ import kha.graphics2.Graphics;
 class BitmapText extends GameObject {
     var image:Image;
     var font:BitmapFont;
-    var textWidth:Int = 0;
+    public var textWidth:Int = 0;
     var text:String;
 
     public function new (x:Int = 0, y:Int = 0, image:Image, font:BitmapFont, text:String = '') {

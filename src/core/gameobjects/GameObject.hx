@@ -39,4 +39,9 @@ class GameObject {
 
     public function getMiddleX () return x + sizeX / 2;
     public function getMiddleY () return y + sizeY / 2;
+
+    public function setPosition (x:Float, y:Float) {
+        this.x = x;
+        this.y = y;
+    }
 }
