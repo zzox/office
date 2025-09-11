@@ -17,12 +17,14 @@ final TILE_HEIGHT = 8;
 class GameScene extends Scene {
     var world:World;
     var uiScene:UiScene;
-    var zoom:Int = 1;
+    var zoom:Int = 0;
     var tilemap:Image;
     var worldActive:Bool = false;
 
     var minX:Int = 0;
     var minY:Int = 0;
+    var maxX:Int = 0;
+    var maxY:Int = 0;
 
     override function create () {
         super.create();
@@ -37,22 +39,30 @@ class GameScene extends Scene {
         game.addScene(uiScene);
 
         makeTilemap();
+        // making tilemap gives us the max and min positions of the tilemap,
+        // we can use the center to start in the center of the map.
+        // TODO: figure out why this puts the map a little too far down
+        camera.scrollX = (minX + maxX) / 2 - camera.width / 2;
+        camera.scrollY = (minY + maxY) / 2 - camera.height / 2;
+
+        // we start all the way zoomed out, so zoom in once
+        zoomIn();
 
         startDay();
     }
 
     override function update (delta:Float) {
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
-        if (Game.keys.pressed(KeyCode.Left)) {
+        if (Game.keys.pressed(KeyCode.Left) && getCenterX() > minX) {
             camera.scrollX -= num;
         }
-        if (Game.keys.pressed(KeyCode.Right)) {
+        if (Game.keys.pressed(KeyCode.Right) && getCenterX() < maxX) {
             camera.scrollX += num;
         }
-        if (Game.keys.pressed(KeyCode.Up)) {
+        if (Game.keys.pressed(KeyCode.Up) && getCenterY() > minY) {
             camera.scrollY -= num;
         }
-        if (Game.keys.pressed(KeyCode.Down)) {
+        if (Game.keys.pressed(KeyCode.Down) && getCenterY() > maxY) {
             camera.scrollY += num;
         }
 
@@ -149,13 +159,13 @@ class GameScene extends Scene {
         // there's a more mathematical way to do this, but looping through all works
         minX = 0;
         minY = 0;
-        var maxX = 0;
-        var maxY = 0;
+        maxX = 0;
+        maxY = 0;
         for (i in items) {
             minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
             minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
-            maxX = Std.int(Math.max(translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH, maxX));
-            maxY = Std.int(Math.max(translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH, maxY));
+            maxX = Std.int(Math.max(maxX, translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH));
+            maxY = Std.int(Math.max(maxY, translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH));
         }
 
         tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
@@ -200,4 +210,7 @@ class GameScene extends Scene {
         camera.scrollY -= (1 / camera.scale) * (camera.height / 2);
         camera.scale = scale;
     }
+
+    inline function getCenterY () return camera.scrollY + camera.height / camera.scale / 2;
+    inline function getCenterX () return camera.scrollX + camera.width / camera.scale / 2;
 }
