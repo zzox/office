@@ -103,14 +103,24 @@ class GameScene extends Scene {
 
         g2.drawImage(tilemap, 0, 0);
 
-        final charXDiff = 8;
+        final charXDiff = 0;
         final charYDiff = 24;
 
         for (i in 0...world.actors.length) {
-            g2.drawImage(
-                Assets.images.char_test,
+            g2.color = 128 * 0x1000000 + 0xffffffff;
+            final tileIndex = 6;
+            g2.drawSubImage(
+                Assets.images.char,
                 translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
-                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff
+                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff,
+                tileIndex * 16, 0, 16, 32
+            );
+            g2.color = 256 * 0x1000000 + 0xffffffff;
+            g2.drawSubImage(
+                Assets.images.char,
+                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
+                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff,
+                0, 0, 16, 32
             );
         }
 
