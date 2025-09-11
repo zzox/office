@@ -53,16 +53,16 @@ class GameScene extends Scene {
 
     override function update (delta:Float) {
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
-        if (Game.keys.pressed(KeyCode.Left) && getCenterX() > minX) {
+        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
             camera.scrollX -= num;
         }
-        if (Game.keys.pressed(KeyCode.Right) && getCenterX() < maxX) {
+        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
             camera.scrollX += num;
         }
-        if (Game.keys.pressed(KeyCode.Up) && getCenterY() > minY) {
+        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
             camera.scrollY -= num;
         }
-        if (Game.keys.pressed(KeyCode.Down) && getCenterY() > maxY) {
+        if (Game.keys.pressed(KeyCode.Down) && camCenterY() > maxY) {
             camera.scrollY += num;
         }
 
@@ -211,6 +211,6 @@ class GameScene extends Scene {
         camera.scale = scale;
     }
 
-    inline function getCenterY () return camera.scrollY + camera.height / camera.scale / 2;
-    inline function getCenterX () return camera.scrollX + camera.width / camera.scale / 2;
+    inline function camCenterY () return camera.scrollY + camera.height / camera.scale / 2;
+    inline function camCenterX () return camera.scrollX + camera.width / camera.scale / 2;
 }
