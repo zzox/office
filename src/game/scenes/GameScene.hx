@@ -62,7 +62,7 @@ class GameScene extends Scene {
         if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
             camera.scrollY -= num;
         }
-        if (Game.keys.pressed(KeyCode.Down) && camCenterY() > maxY) {
+        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
             camera.scrollY += num;
         }
 
