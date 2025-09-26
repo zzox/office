@@ -19,6 +19,9 @@ class GameObject {
 
     public var components:Array<Component> = [];
 
+    public var color:Int = 0xffffff;
+    public var alpha:Float = 1.0;
+
     public function start () {
         active = true;
         visible = true;
@@ -43,5 +46,10 @@ class GameObject {
     public function setPosition (x:Float, y:Float) {
         this.x = x;
         this.y = y;
+    }
+
+    public function setScrollFactor (x:Float, y:Float) {
+        this.scrollFactorX = x;
+        this.scrollFactorY = y;
     }
 }
