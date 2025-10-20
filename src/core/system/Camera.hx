@@ -25,8 +25,8 @@ class Camera extends System {
     public var boundsMaxX:Int = Const.RBN;
     public var boundsMaxY:Int = Const.RBN;
 
-    public var offsetX:Int;
-    public var offsetY:Int;
+    public var offsetX:Int = 0;
+    public var offsetY:Int = 0;
 
     public var lerpX:Float = 1.0;
     public var lerpY:Float = 1.0;

@@ -61,6 +61,7 @@ function mapGIItems<T, TT> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> TT)
     // }
 
     final items = [];
+    // TODO: flip
     for (x in 0...grid.width) {
         for (y in 0...grid.height) {
             items.push(callback(x, y, grid.items[x + y * grid.width]));

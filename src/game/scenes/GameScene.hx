@@ -42,28 +42,30 @@ class GameScene extends Scene {
         // making tilemap gives us the max and min positions of the tilemap,
         // we can use the center to start in the center of the map.
         // TODO: figure out why this puts the map a little too far down
-        camera.scrollX = (minX + maxX) / 2 - camera.width / 2;
-        camera.scrollY = (minY + maxY) / 2 - camera.height / 2;
+
+        trace(minX, minY, maxX, maxY);
+
+        camera.scrollX = (-minX + maxX) / 2 - camera.width / 2;
+        camera.scrollY = (-minY + maxY) / 2 - camera.height / 2;
 
         // we start all the way zoomed out, so zoom in once
-        zoomIn();
+        // zoomIn();
 
         startDay();
     }
 
     override function update (delta:Float) {
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
-        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
-            // TODO: use max or min
+        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > 0) {
             camera.scrollX -= num;
         }
-        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
+        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX - minX) {
             camera.scrollX += num;
         }
-        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
+        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > 0) {
             camera.scrollY -= num;
         }
-        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
+        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY - minY) {
             camera.scrollY += num;
         }
 
@@ -214,6 +216,6 @@ class GameScene extends Scene {
         camera.scale = scale;
     }
 
-    inline function camCenterY () return camera.scrollY + camera.height / camera.scale / 2;
-    inline function camCenterX () return camera.scrollX + camera.width / camera.scale / 2;
+    inline function camCenterX () return camera.scrollX + (camera.width / 2) / camera.scale;
+    inline function camCenterY () return camera.scrollY + (camera.height / 2) / camera.scale;
 }
