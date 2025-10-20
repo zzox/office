@@ -178,6 +178,7 @@ class World {
         if (actor.path[0] != null) {
             if (!checkCollision(actor.path[0].x, actor.path[0].y)) {
                 final item = actor.path.shift();
+                actor.facing = getDirFromDiff(item.x - actor.getX(), item.y - actor.getY());
                 actor.move = {
                     fromX: actor.getX(),
                     fromY: actor.getY(),

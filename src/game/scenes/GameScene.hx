@@ -122,28 +122,43 @@ class GameScene extends Scene {
         final charXDiff = 0;
         final charYDiff = 24;
 
-        for (i in 0...world.actors.length) {
-            final actor = world.actors[i];
+        final actors = world.actors.copy();
+
+        actors.sort((a, b) -> {
+            return Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast));
+        });
+
+        // tile size here
+        final sizeX = 16;
+        final sizeY = 32;
+
+        for (i in 0...actors.length) {
+            final actor = actors[i];
 
             g2.color = 0x80 * 0x1000000 + 0xffffff;
             var tileIndex = 6;
-            g2.drawSubImage(
+            g2.drawScaledSubImage(
                 Assets.images.char,
+                tileIndex * 16, 0, sizeX, sizeY,
                 translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
                 translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
-                tileIndex * 16, 0, 16, 32
+                sizeX, sizeY
             );
             g2.color = 0xff * 0x1000000 + 0xffffff;
+            var flipX = false;
             if (actor.move != null) {
-                tileIndex = [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
+                // can the fifth index happen?                                                             vvv
+                tileIndex = (actor.facing == NorthEast || actor.facing == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
+                flipX = actor.facing == NorthWest || actor.facing == SouthWest;
             } else {
                 tileIndex = 0;
             }
-            g2.drawSubImage(
+            g2.drawScaledSubImage(
                 Assets.images.char,
-                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
+                tileIndex * 16, 0, sizeX, sizeY,
+                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff + (flipX ? sizeX : 0),
                 translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
-                tileIndex * 16, 0, 16, 32
+                sizeX * (flipX ? -1 : 1), sizeY
             );
         }
 

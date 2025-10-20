@@ -77,3 +77,11 @@ function getGridItem<T> (grid:Grid<T>, x:Int, y:Int):Null<T> {
 
     return grid.items[x + y * grid.width];
 }
+
+function getDirFromDiff (diffX:Int, diffY:Int):RotationDir {
+    if (diffX == 1 && diffY == 0) return NorthEast;
+    if (diffX == 0 && diffY == -1) return NorthWest;
+    if (diffX == 0 && diffY == 1) return SouthEast;
+    if (diffX == -1 && diffY == 0) return SouthWest;
+    throw 'Dir not found';
+}
