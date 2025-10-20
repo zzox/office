@@ -119,12 +119,6 @@ class Game {
             // if (!s.isPaused) {
                 s.update(delta);
             // }
-
-            // resize the camera if we use the `Full` scale mode.
-            if (scaleMode == Full) {
-                s.camera.width = width;
-                s.camera.height = height;
-            }
         }
 
         // after the scenes to clear `justPressed`
@@ -181,6 +175,9 @@ class Game {
         setSize(framebuffer.width, framebuffer.height);
 
         for (s in 0...scenes.length) {
+            // resize the camera if we use the `Full` scale mode.
+            scenes[s].camera.width = width;
+            scenes[s].camera.height = height;
             scenes[s].render(framebuffer.g2, /* framebuffer.g4 */ s == 0);
         }
     }

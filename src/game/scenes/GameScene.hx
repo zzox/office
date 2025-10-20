@@ -38,18 +38,15 @@ class GameScene extends Scene {
 
         game.addScene(uiScene);
 
-        makeTilemap();
         // making tilemap gives us the max and min positions of the tilemap,
         // we can use the center to start in the center of the map.
-        // TODO: figure out why this puts the map a little too far down
-
-        trace(minX, minY, maxX, maxY);
-
+        makeTilemap();
         camera.scrollX = (-minX + maxX) / 2 - camera.width / 2;
         camera.scrollY = (-minY + maxY) / 2 - camera.height / 2;
+        trace(minX, minY, maxX, maxY);
 
         // we start all the way zoomed out, so zoom in once
-        // zoomIn();
+        zoomIn();
 
         startDay();
     }
