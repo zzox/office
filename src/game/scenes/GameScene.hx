@@ -132,18 +132,24 @@ class GameScene extends Scene {
         final sizeX = 16;
         final sizeY = 32;
 
+        final image = Assets.images.char;
+
         for (i in 0...actors.length) {
             final actor = actors[i];
 
+            // render shadow
             g2.color = 0x80 * 0x1000000 + 0xffffff;
             var tileIndex = 6;
+            final cols = Std.int(image.width / sizeX);
             g2.drawScaledSubImage(
-                Assets.images.char,
-                tileIndex * 16, 0, sizeX, sizeY,
+                image,
+                (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
                 translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
                 translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
                 sizeX, sizeY
             );
+
+            // render actor
             g2.color = 0xff * 0x1000000 + 0xffffff;
             var flipX = false;
             if (actor.move != null) {
@@ -154,8 +160,8 @@ class GameScene extends Scene {
                 tileIndex = 0;
             }
             g2.drawScaledSubImage(
-                Assets.images.char,
-                tileIndex * 16, 0, sizeX, sizeY,
+                image,
+                (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
                 translateWorldX(actor.x, actor.y, SouthEast) - charXDiff + (flipX ? sizeX : 0),
                 translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
                 sizeX * (flipX ? -1 : 1), sizeY
