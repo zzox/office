@@ -123,20 +123,27 @@ class GameScene extends Scene {
         final charYDiff = 24;
 
         for (i in 0...world.actors.length) {
+            final actor = world.actors[i];
+
             g2.color = 0x80 * 0x1000000 + 0xffffff;
-            final tileIndex = 6;
+            var tileIndex = 6;
             g2.drawSubImage(
                 Assets.images.char,
-                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - charXDiff,
-                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - charYDiff,
+                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
+                translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
                 tileIndex * 16, 0, 16, 32
             );
             g2.color = 0xff * 0x1000000 + 0xffffff;
+            if (actor.move != null) {
+                tileIndex = [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
+            } else {
+                tileIndex = 0;
+            }
             g2.drawSubImage(
                 Assets.images.char,
-                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - charXDiff,
-                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - charYDiff,
-                0, 0, 16, 32
+                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
+                translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
+                tileIndex * 16, 0, 16, 32
             );
         }
 
