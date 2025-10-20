@@ -77,7 +77,8 @@ class GameScene extends Scene {
             steps += 3;
         }
 
-        uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
+        uiScene.setMiddleText('${Game.mouse.position.x},${Game.mouse.position.y}', 1.0);
+        // uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
 
         if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
             zoomOut();
