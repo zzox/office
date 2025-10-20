@@ -41,8 +41,8 @@ class GameScene extends Scene {
         // making tilemap gives us the max and min positions of the tilemap,
         // we can use the center to start in the center of the map.
         makeTilemap();
-        camera.scrollX = (-minX + maxX) / 2 - camera.width / 2;
-        camera.scrollY = (-minY + maxY) / 2 - camera.height / 2;
+        camera.scrollX = (minX + maxX) / 2 - camera.width / 2;
+        camera.scrollY = (minY + maxY) / 2 - camera.height / 2;
         trace(minX, minY, maxX, maxY);
 
         // we start all the way zoomed out, so zoom in once
@@ -53,16 +53,16 @@ class GameScene extends Scene {
 
     override function update (delta:Float) {
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
-        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > 0) {
+        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
             camera.scrollX -= num;
         }
-        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX - minX) {
+        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
             camera.scrollX += num;
         }
-        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > 0) {
+        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
             camera.scrollY -= num;
         }
-        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY - minY) {
+        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
             camera.scrollY += num;
         }
 
@@ -85,6 +85,10 @@ class GameScene extends Scene {
 
         if (Game.keys.justPressed(KeyCode.Equals)) {
             zoomIn();
+        }
+
+        if (Game.keys.justPressed(KeyCode.R)) {
+            game.changeScene(new GameScene());
         }
 
         if (worldActive) {
@@ -113,7 +117,7 @@ class GameScene extends Scene {
         g2.pushTranslation(-camera.scrollX, -camera.scrollY);
         g2.pushScale(camera.scale, camera.scale);
 
-        g2.drawImage(tilemap, 0, 0);
+        g2.drawImage(tilemap, minX, minY);
 
         final charXDiff = 0;
         final charYDiff = 24;
@@ -123,15 +127,15 @@ class GameScene extends Scene {
             final tileIndex = 6;
             g2.drawSubImage(
                 Assets.images.char,
-                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
-                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff,
+                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - charXDiff,
+                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - charYDiff,
                 tileIndex * 16, 0, 16, 32
             );
             g2.color = 0xff * 0x1000000 + 0xffffff;
             g2.drawSubImage(
                 Assets.images.char,
-                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
-                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff,
+                translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - charXDiff,
+                translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - charYDiff,
                 0, 0, 16, 32
             );
         }
