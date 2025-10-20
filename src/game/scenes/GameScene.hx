@@ -54,6 +54,7 @@ class GameScene extends Scene {
     override function update (delta:Float) {
         final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
         if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
+            // TODO: use max or min
             camera.scrollX -= num;
         }
         if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
@@ -68,14 +69,16 @@ class GameScene extends Scene {
 
         var steps = 1;
         if (Game.keys.pressed(KeyCode.J)) {
-            steps += 64;
+            steps += 256;
         } else if (Game.keys.pressed(KeyCode.H)) {
-            steps += 15;
+            steps += 64;
         } else if (Game.keys.pressed(KeyCode.G)) {
-            steps += 7;
+            steps += 16;
         } else if (Game.keys.pressed(KeyCode.F)) {
             steps += 3;
         }
+
+        uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
 
         if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
             zoomOut();
@@ -117,7 +120,7 @@ class GameScene extends Scene {
         final charYDiff = 24;
 
         for (i in 0...world.actors.length) {
-            g2.color = 128 * 0x1000000 + 0xffffffff;
+            g2.color = 0x80 * 0x1000000 + 0xffffff;
             final tileIndex = 6;
             g2.drawSubImage(
                 Assets.images.char,
@@ -125,7 +128,7 @@ class GameScene extends Scene {
                 translateWorldY(world.actors[i].x, world.actors[i].y, SouthEast) - minY - charYDiff,
                 tileIndex * 16, 0, 16, 32
             );
-            g2.color = 256 * 0x1000000 + 0xffffffff;
+            g2.color = 0xff * 0x1000000 + 0xffffff;
             g2.drawSubImage(
                 Assets.images.char,
                 translateWorldX(world.actors[i].x, world.actors[i].y, SouthEast) - minX - charXDiff,
@@ -165,7 +168,7 @@ class GameScene extends Scene {
             minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
             minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
             maxX = Std.int(Math.max(maxX, translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH));
-            maxY = Std.int(Math.max(maxY, translateWorldY(i.x, i.y, SouthEast) + TILE_WIDTH));
+            maxY = Std.int(Math.max(maxY, translateWorldY(i.x, i.y, SouthEast) + TILE_HEIGHT));
         }
 
         tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
