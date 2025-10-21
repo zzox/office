@@ -8,6 +8,7 @@ import game.world.World;
 
 class UiScene extends Scene {
     var world:World;
+    var dayText:BitmapText;
     var timeText:BitmapText;
 
     var middleTextTime:Float = 0.0;
@@ -24,7 +25,8 @@ class UiScene extends Scene {
     override function create () {
         super.create();
         camera.scale = 2;
-        entities.push(timeText = makeBitmapText(4, 4, ''));
+        entities.push(dayText = makeBitmapText(4, 4, ''));
+        entities.push(timeText = makeBitmapText(4, 14, ''));
         entities.push(middleText = makeBitmapText(0, 64, ''));
         entities.push(middleSubtext = makeBitmapText(0, 80, ''));
 
@@ -38,6 +40,7 @@ class UiScene extends Scene {
     override function update (delta:Float) {
         super.update(delta);
 
+        dayText.setText('Day ${world.day + 1}');
         timeText.setText(TextUtil.formatTime(world.time));
         middleTextTime -= delta;
         middleText.setPosition(Math.floor(((camera.width - middleText.textWidth) / 2) / 2), middleText.y);

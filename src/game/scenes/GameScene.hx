@@ -186,6 +186,8 @@ class GameScene extends Scene {
             );
         }
 
+        // TODO: adjust this scale nonsenese
+        // TODO: particle class that is tied to an x and z position, y position is tied to time
         final scale = camera.scale;
         camera.scale = 1;
         for (n in numbers) if (n.visible) n.render(g2, camera);
@@ -197,28 +199,6 @@ class GameScene extends Scene {
         g2.end();
 
         super.render(g2, false);
-    }
-
-    function rotateLeft () {
-        var num = (worldRotation - 1) % 4;
-        if (num < 0) num += 4;
-        worldRotation = cast(num);
-        makeTilemap();
-        final matrix = FastMatrix2.rotation(-Math.PI / 2);
-        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
-        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
-        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
-        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
-    }
-
-    function rotateRight () {
-        worldRotation = cast((worldRotation + 1) % 4);
-        makeTilemap();
-        final matrix = FastMatrix2.rotation(Math.PI / 2);
-        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
-        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
-        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
-        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
     }
 
     function startDay () {
@@ -314,6 +294,28 @@ class GameScene extends Scene {
         if (Game.keys.justPressed(KeyCode.Equals)) {
             zoomIn();
         }
+    }
+
+    function rotateLeft () {
+        var num = (worldRotation - 1) % 4;
+        if (num < 0) num += 4;
+        worldRotation = cast(num);
+        makeTilemap();
+        final matrix = FastMatrix2.rotation(-Math.PI / 2);
+        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
+        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
+        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
+        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
+    }
+
+    function rotateRight () {
+        worldRotation = cast((worldRotation + 1) % 4);
+        makeTilemap();
+        final matrix = FastMatrix2.rotation(Math.PI / 2);
+        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
+        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
+        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
+        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
     }
 
     public function zoomIn () {
