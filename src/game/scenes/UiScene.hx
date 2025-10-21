@@ -14,6 +14,8 @@ class UiScene extends Scene {
     var middleText:BitmapText;
     var middleSubtext:BitmapText;
 
+    public var devTexts:Array<BitmapText> = [];
+
     public function new (world:World) {
         super();
         this.world = world;
@@ -25,6 +27,12 @@ class UiScene extends Scene {
         entities.push(timeText = makeBitmapText(4, 4, ''));
         entities.push(middleText = makeBitmapText(0, 64, ''));
         entities.push(middleSubtext = makeBitmapText(0, 80, ''));
+
+        for (i in 0...8) {
+            final text = makeBitmapText(4, 100 + i * 10, '');
+            entities.push(text);
+            devTexts.push(text);
+        }
     }
 
     override function update (delta:Float) {

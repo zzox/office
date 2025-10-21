@@ -5,6 +5,7 @@ import core.components.Family;
 import core.gameobjects.BitmapText;
 import core.scene.Scene;
 import game.ui.UiText;
+import game.util.Utils.getTilePosAt;
 import game.world.Grid;
 import game.world.World;
 import haxe.ds.ArraySort;
@@ -65,41 +66,15 @@ class GameScene extends Scene {
     }
 
     override function update (delta:Float) {
-        final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
-        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
-            camera.scrollX -= num;
-        }
-        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
-            camera.scrollX += num;
-        }
-        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
-            camera.scrollY -= num;
-        }
-        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
-            camera.scrollY += num;
-        }
-
-        if (Game.keys.justPressed(KeyCode.OpenBracket)) {
-            rotateLeft();
-        }
-
-        if (Game.keys.justPressed(KeyCode.CloseBracket)) {
-            rotateRight();
-        }
-
-        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
-            zoomOut();
-        }
-
-        if (Game.keys.justPressed(KeyCode.Equals)) {
-            zoomIn();
-        }
+        handleCamera();
 
         // TODO: move into method
         final screenPosX = camera.scrollX + Game.mouse.position.x / camera.scale;
         final screenPosY = camera.scrollY + Game.mouse.position.y / camera.scale;
+        uiScene.devTexts[0].setText('${Game.mouse.position.x},${Game.mouse.position.y}, ${screenPosX},${screenPosY}');
 
-        uiScene.setMiddleText('${Game.mouse.position.x},${Game.mouse.position.y}, ${screenPosX},${screenPosY}', 1.0);
+        final tilePosAt = getTilePosAt(screenPosX, screenPosY, worldRotation, world.grid.width, world.grid.height);
+        uiScene.devTexts[1].setText('${tilePosAt.x},${tilePosAt.y}');
         // uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
 
         if (Game.keys.justPressed(KeyCode.R)) {
@@ -305,6 +280,38 @@ class GameScene extends Scene {
         }
 
         tilemap.g2.end();
+    }
+
+    inline function handleCamera () {
+        final num = Game.keys.pressed(KeyCode.Shift) ? 4.0 : 1.0;
+        if (Game.keys.pressed(KeyCode.Left) && camCenterX() > minX) {
+            camera.scrollX -= num;
+        }
+        if (Game.keys.pressed(KeyCode.Right) && camCenterX() < maxX) {
+            camera.scrollX += num;
+        }
+        if (Game.keys.pressed(KeyCode.Up) && camCenterY() > minY) {
+            camera.scrollY -= num;
+        }
+        if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
+            camera.scrollY += num;
+        }
+
+        if (Game.keys.justPressed(KeyCode.OpenBracket)) {
+            rotateLeft();
+        }
+
+        if (Game.keys.justPressed(KeyCode.CloseBracket)) {
+            rotateRight();
+        }
+
+        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
+            zoomOut();
+        }
+
+        if (Game.keys.justPressed(KeyCode.Equals)) {
+            zoomIn();
+        }
     }
 
     public function zoomIn () {
