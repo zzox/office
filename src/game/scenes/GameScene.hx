@@ -205,18 +205,20 @@ class GameScene extends Scene {
         worldRotation = cast(num);
         makeTilemap();
         final matrix = FastMatrix2.rotation(-Math.PI / 2);
-        final ans = matrix.multvec(new FastVector2(camCenterX() * 0.5, camCenterY()));
-        camera.scrollX = ans.x - (camera.width / 2) / camera.scale;
-        camera.scrollY = ans.y - (camera.height / 2) / camera.scale;
+        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
+        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
+        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
+        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
     }
 
     function rotateRight () {
         worldRotation = cast((worldRotation + 1) % 4);
         makeTilemap();
         final matrix = FastMatrix2.rotation(Math.PI / 2);
-        final ans = matrix.multvec(new FastVector2(camCenterX() * 0.5, camCenterY()));
-        camera.scrollX = ans.x - (camera.width / 2) / camera.scale;
-        camera.scrollY = ans.y - (camera.height / 2) / camera.scale;
+        final tilePos = getTilePosAt(camCenterX(), camCenterY(), worldRotation, world.grid.width, world.grid.height);
+        final ans = matrix.multvec(new FastVector2(tilePos.x, tilePos.y));
+        camera.scrollX = translateWorldX(ans.x, ans.y, worldRotation) - (camera.width / 2) / camera.scale;
+        camera.scrollY = translateWorldY(ans.x, ans.y, worldRotation) - (camera.height / 2) / camera.scale;
     }
 
     function startDay () {
