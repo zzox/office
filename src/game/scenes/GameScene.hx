@@ -87,15 +87,12 @@ class GameScene extends Scene {
             rotateRight();
         }
 
-        var steps = 1;
-        if (Game.keys.pressed(KeyCode.J)) {
-            steps += 256;
-        } else if (Game.keys.pressed(KeyCode.H)) {
-            steps += 64;
-        } else if (Game.keys.pressed(KeyCode.G)) {
-            steps += 16;
-        } else if (Game.keys.pressed(KeyCode.F)) {
-            steps += 3;
+        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
+            zoomOut();
+        }
+
+        if (Game.keys.justPressed(KeyCode.Equals)) {
+            zoomIn();
         }
 
         // TODO: move into method
@@ -105,16 +102,19 @@ class GameScene extends Scene {
         uiScene.setMiddleText('${Game.mouse.position.x},${Game.mouse.position.y}, ${screenPosX},${screenPosY}', 1.0);
         // uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
 
-        if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
-            zoomOut();
-        }
-
-        if (Game.keys.justPressed(KeyCode.Equals)) {
-            zoomIn();
-        }
-
         if (Game.keys.justPressed(KeyCode.R)) {
             game.changeScene(new GameScene());
+        }
+
+        var steps = 1;
+        if (Game.keys.pressed(KeyCode.J)) {
+            steps += 256;
+        } else if (Game.keys.pressed(KeyCode.H)) {
+            steps += 64;
+        } else if (Game.keys.pressed(KeyCode.G)) {
+            steps += 16;
+        } else if (Game.keys.pressed(KeyCode.F)) {
+            steps += 3;
         }
 
         if (worldActive) {
@@ -229,19 +229,19 @@ class GameScene extends Scene {
         if (num < 0) num += 4;
         worldRotation = cast(num);
         makeTilemap();
-        // final matrix = FastMatrix2.rotation(Math.PI / 2);
-        // final ans = matrix.multvec(new FastVector2(camCenterX(), camCenterY()));
-        // camera.scrollX = ans.x - (camera.width / 2);
-        // camera.scrollY = ans.y - (camera.height / 2);
+        final matrix = FastMatrix2.rotation(-Math.PI / 2);
+        final ans = matrix.multvec(new FastVector2(camCenterX() * 0.5, camCenterY()));
+        camera.scrollX = ans.x - (camera.width / 2) / camera.scale;
+        camera.scrollY = ans.y - (camera.height / 2) / camera.scale;
     }
 
     function rotateRight () {
         worldRotation = cast((worldRotation + 1) % 4);
         makeTilemap();
-        // final matrix = FastMatrix2.rotation(-Math.PI / 2);
-        // final ans = matrix.multvec(new FastVector2(camCenterX(), camCenterY()));
-        // camera.scrollX = ans.x - (camera.width / 2);
-        // camera.scrollY = ans.y - (camera.height / 2);
+        final matrix = FastMatrix2.rotation(Math.PI / 2);
+        final ans = matrix.multvec(new FastVector2(camCenterX() * 0.5, camCenterY()));
+        camera.scrollX = ans.x - (camera.width / 2) / camera.scale;
+        camera.scrollY = ans.y - (camera.height / 2) / camera.scale;
     }
 
     function startDay () {
