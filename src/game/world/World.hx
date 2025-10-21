@@ -15,6 +15,7 @@ enum TileItem {
 enum EventType {
     Arrive;
     Leave;
+    Temp;
 }
 
 typedef Event = {
@@ -70,8 +71,6 @@ class World {
                     tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
                 }
             }
-
-            // addEvent(Arrive, a);
         }
 
         // handle actor movement
@@ -159,6 +158,7 @@ class World {
         if (path != null) {
             actor.path = clonePath(path);
             actor.state = Move;
+            addEvent(Temp, actor);
         } else {
             // TODO: remove
             trace('could not find path');

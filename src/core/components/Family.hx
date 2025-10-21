@@ -2,6 +2,7 @@ package core.components;
 
 import core.components.Component;
 
+// not actually a family
 class Family<T:Component> {
     public var items:Array<T> = [];
     var index:Int = -1;

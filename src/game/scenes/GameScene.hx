@@ -1,6 +1,8 @@
 package game.scenes;
 
 import core.Game;
+import core.components.Family;
+import core.gameobjects.BitmapText;
 import core.scene.Scene;
 import game.ui.UiText;
 import game.world.Grid;
@@ -23,6 +25,8 @@ class GameScene extends Scene {
     var tilemap:Image;
     var worldActive:Bool = false;
     var worldRotation:RotationDir = SouthEast;
+
+    var numbers:Array<BitmapText> = [];
 
     var minX:Int = 0;
     var minY:Int = 0;
@@ -52,6 +56,12 @@ class GameScene extends Scene {
         zoomIn();
 
         startDay();
+
+        for (_ in 0...20) {
+            final number = makeSmallText(-16, -16, '');
+            number.color = 0x6cd947;
+            numbers.push(number);
+        }
     }
 
     override function update (delta:Float) {
@@ -112,6 +122,20 @@ class GameScene extends Scene {
 
             if (!worldActive) {
                 dayOver();
+            }
+        }
+
+        for (n in numbers) {
+            n.y--;
+        }
+
+        for (ev in world.getEvents()) {
+            if (ev.type == Temp) {
+                makeNumber(
+                    Math.floor(translateWorldX(ev.actor.x, ev.actor.y, worldRotation) + 8),
+                    Math.floor(translateWorldY(ev.actor.x, ev.actor.y, worldRotation) - 16),
+                    Math.floor(Math.random() * 1000)
+                );
             }
         }
 
@@ -183,6 +207,11 @@ class GameScene extends Scene {
             );
         }
 
+        final scale = camera.scale;
+        camera.scale = 1;
+        for (n in numbers) if (n.visible) n.render(g2, camera);
+        camera.scale = scale;
+
         g2.popTransformation();
         g2.popTransformation();
 
@@ -219,6 +248,15 @@ class GameScene extends Scene {
 
     function dayOver () {
         startDay();
+    }
+
+    var numIndex = -1;
+    function makeNumber (x:Int, y:Int, amount:Int) {
+        final num = numbers[(++numIndex % numbers.length)];
+
+        num.setText(amount + '');
+        num.x = Math.floor(x - num.textWidth / 2);
+        num.y = y;
     }
 
     function makeTilemap () {

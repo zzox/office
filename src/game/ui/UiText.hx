@@ -37,5 +37,7 @@ function makeBitmapText (posX:Int, posY:Int, text:String = ''):BitmapText {
 }
 
 function makeSmallText (posX:Int, posY:Int, text:String = ''):BitmapText {
-    return new BitmapText(posX, posY, Assets.images.cards_text, UiText.smallFont, text);
+    final text = new BitmapText(posX, posY, Assets.images.cards_text_outline, UiText.smallFont, text);
+    text.setScrollFactor(0, 0);
+    return text;
 }
