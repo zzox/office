@@ -10,6 +10,8 @@ import kha.Assets;
 import kha.Image;
 import kha.graphics2.Graphics;
 import kha.input.KeyCode;
+import kha.math.FastMatrix2;
+import kha.math.FastVector2;
 
 final TILE_WIDTH = 16;
 final TILE_HEIGHT = 8;
@@ -194,11 +196,19 @@ class GameScene extends Scene {
         if (num < 0) num += 4;
         worldRotation = cast(num);
         makeTilemap();
+        // final matrix = FastMatrix2.rotation(Math.PI / 2);
+        // final ans = matrix.multvec(new FastVector2(camCenterX(), camCenterY()));
+        // camera.scrollX = ans.x - (camera.width / 2);
+        // camera.scrollY = ans.y - (camera.height / 2);
     }
 
     function rotateRight () {
         worldRotation = cast((worldRotation + 1) % 4);
         makeTilemap();
+        // final matrix = FastMatrix2.rotation(-Math.PI / 2);
+        // final ans = matrix.multvec(new FastVector2(camCenterX(), camCenterY()));
+        // camera.scrollX = ans.x - (camera.width / 2);
+        // camera.scrollY = ans.y - (camera.height / 2);
     }
 
     function startDay () {
@@ -231,11 +241,24 @@ class GameScene extends Scene {
 
         tilemap.g2.begin(true, 0x00000000);
 
+        final sizeX = 16;
+        final sizeY = 16;
+
+        final image = Assets.images.tiles;
+        final cols = Std.int(image.width / sizeX);
         for (i in 0...items.length) {
-            tilemap.g2.drawSubImage(Assets.images.tiles,
+            var tileIndex = 0;
+            if (items[i].item == Entrance) {
+                tileIndex = 1;
+            } else if (items[i].item == Exit) {
+                tileIndex = 2;
+            }
+
+            tilemap.g2.drawSubImage(
+                image,
                 translateWorldX(items[i].x, items[i].y, worldRotation) - minX,
                 translateWorldY(items[i].x, items[i].y, worldRotation) - minY,
-                0, 0, 16, 16
+                (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY
             );
         }
 

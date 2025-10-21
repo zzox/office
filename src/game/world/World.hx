@@ -27,12 +27,12 @@ function calcPosition (moveFrom:Int, moveTo:Int, percentMoved:Float):Float {
 }
 
 class World {
-    public var grid:Grid<Int>;
+    public var grid:Grid<TileItem>;
     public var actors:Array<Actor> = [];
-    public var tiles:Grid<TileItem>;
+    // public var tiles:Grid<TileItem>;
 
-    var entrance:IntVec2;
-    var exit:IntVec2;
+    public var entrance:IntVec2;
+    public var exit:IntVec2;
 
     public var time:Int;
     public var day:Int = -1;
@@ -40,10 +40,20 @@ class World {
     public var events:Array<Event> = [];
 
     public function new () {
+        final size = new IntVec2(25, 25);
         entrance = new IntVec2(12, 0);
         exit = new IntVec2(14, 0);
 
-        grid = makeGrid(25, 25, 0);
+        grid = {
+            width: size.x,
+            height: size.y,
+            items: mapGIItems(makeGrid(size.x, size.y, Tile), (x, y, item) -> {
+                if (entrance.x == x && entrance.y == y) return Entrance;
+                if (exit.x == x && exit.y == y) return Exit;
+                return item;
+            })
+        }
+
         for (_ in 0...3) {
             actors.push(new Actor('test${Actor.curId}'));
         }
