@@ -20,6 +20,7 @@ class GameScene extends Scene {
     var zoom:Int = 0;
     var tilemap:Image;
     var worldActive:Bool = false;
+    var worldRotation:RotationDir = SouthEast;
 
     var minX:Int = 0;
     var minY:Int = 0;
@@ -64,6 +65,14 @@ class GameScene extends Scene {
         }
         if (Game.keys.pressed(KeyCode.Down) && camCenterY() < maxY) {
             camera.scrollY += num;
+        }
+
+        if (Game.keys.justPressed(KeyCode.OpenBracket)) {
+            rotateLeft();
+        }
+
+        if (Game.keys.justPressed(KeyCode.CloseBracket)) {
+            rotateRight();
         }
 
         var steps = 1;
@@ -145,26 +154,29 @@ class GameScene extends Scene {
             g2.drawScaledSubImage(
                 image,
                 (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff,
-                translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
+                translateWorldX(actor.x, actor.y, worldRotation) - charXDiff,
+                translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
                 sizeX, sizeY
             );
+
+            // figure facing
+            final facingDir = calculateFacing(actor.facing, worldRotation);
 
             // render actor
             g2.color = 0xff * 0x1000000 + 0xffffff;
             var flipX = false;
             if (actor.move != null) {
                 // can the fifth index happen?                                                             vvv
-                tileIndex = (actor.facing == NorthEast || actor.facing == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
-                flipX = actor.facing == NorthWest || actor.facing == SouthWest;
+                tileIndex = (facingDir == NorthEast || facingDir == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
+                flipX = facingDir == NorthWest || facingDir == SouthWest;
             } else {
                 tileIndex = 0;
             }
             g2.drawScaledSubImage(
                 image,
                 (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                translateWorldX(actor.x, actor.y, SouthEast) - charXDiff + (flipX ? sizeX : 0),
-                translateWorldY(actor.x, actor.y, SouthEast) - charYDiff,
+                translateWorldX(actor.x, actor.y, worldRotation) - charXDiff + (flipX ? sizeX : 0),
+                translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
                 sizeX * (flipX ? -1 : 1), sizeY
             );
         }
@@ -175,6 +187,18 @@ class GameScene extends Scene {
         g2.end();
 
         super.render(g2, false);
+    }
+
+    function rotateLeft () {
+        var num = (worldRotation - 1) % 4;
+        if (num < 0) num += 4;
+        worldRotation = cast(num);
+        makeTilemap();
+    }
+
+    function rotateRight () {
+        worldRotation = cast((worldRotation + 1) % 4);
+        makeTilemap();
     }
 
     function startDay () {
@@ -189,7 +213,7 @@ class GameScene extends Scene {
 
     function makeTilemap () {
         final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
-        ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast)));
+        ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, worldRotation)) - Std.int(translateWorldY(b.x, b.y, worldRotation)));
 
         // there's a more mathematical way to do this, but looping through all works
         minX = 0;
@@ -197,10 +221,10 @@ class GameScene extends Scene {
         maxX = 0;
         maxY = 0;
         for (i in items) {
-            minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, SouthEast)));
-            minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, SouthEast)));
-            maxX = Std.int(Math.max(maxX, translateWorldX(i.x, i.y, SouthEast) + TILE_WIDTH));
-            maxY = Std.int(Math.max(maxY, translateWorldY(i.x, i.y, SouthEast) + TILE_HEIGHT));
+            minX = Std.int(Math.min(minX, translateWorldX(i.x, i.y, worldRotation)));
+            minY = Std.int(Math.min(minY, translateWorldY(i.x, i.y, worldRotation)));
+            maxX = Std.int(Math.max(maxX, translateWorldX(i.x, i.y, worldRotation) + TILE_WIDTH));
+            maxY = Std.int(Math.max(maxY, translateWorldY(i.x, i.y, worldRotation) + TILE_HEIGHT));
         }
 
         tilemap = Image.createRenderTarget(maxX - minX, maxY - minY);
@@ -209,8 +233,8 @@ class GameScene extends Scene {
 
         for (i in 0...items.length) {
             tilemap.g2.drawSubImage(Assets.images.tiles,
-                translateWorldX(items[i].x, items[i].y, SouthEast) - minX,
-                translateWorldY(items[i].x, items[i].y, SouthEast) - minY,
+                translateWorldX(items[i].x, items[i].y, worldRotation) - minX,
+                translateWorldY(items[i].x, items[i].y, worldRotation) - minY,
                 0, 0, 16, 16
             );
         }

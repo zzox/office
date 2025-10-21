@@ -9,7 +9,7 @@ typedef Grid<T> = {
 /**
  * Methods for making and handling grids.
  */
-enum abstract RotationDir(Int) to Int {
+enum abstract RotationDir(Int) from Int to Int {
     // North;
     // South;
     // East;
@@ -20,6 +20,7 @@ enum abstract RotationDir(Int) to Int {
     var NorthEast = 3;
 }
 
+// PERF: break the following two methods out to individual methods to be set on rotation
 function translateWorldX (x:Float, y:Float, rotation:RotationDir):Float {
     return switch (rotation) {
         case SouthEast: (x * 8) + (y * 8);
@@ -84,4 +85,12 @@ function getDirFromDiff (diffX:Int, diffY:Int):RotationDir {
     if (diffX == 0 && diffY == 1) return SouthEast;
     if (diffX == -1 && diffY == 0) return SouthWest;
     throw 'Dir not found';
+}
+
+function calculateFacing (actorFacing:Int, worldRotation:Int):RotationDir {
+    var num = (actorFacing + worldRotation) % 4;
+    while(num < 0) {
+        num += 4;
+    }
+    return cast(num);
 }
