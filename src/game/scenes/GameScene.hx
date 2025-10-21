@@ -98,7 +98,11 @@ class GameScene extends Scene {
             steps += 3;
         }
 
-        uiScene.setMiddleText('${Game.mouse.position.x},${Game.mouse.position.y}', 1.0);
+        // TODO: move into method
+        final screenPosX = camera.scrollX + Game.mouse.position.x / camera.scale;
+        final screenPosY = camera.scrollY + Game.mouse.position.y / camera.scale;
+
+        uiScene.setMiddleText('${Game.mouse.position.x},${Game.mouse.position.y}, ${screenPosX},${screenPosY}', 1.0);
         // uiScene.setMiddleText('${camCenterX()} ${camCenterY()} ${minX} ${minY} ${maxX} ${maxY}', 1.0);
 
         if (Game.keys.justPressed(KeyCode.HyphenMinus)) {
