@@ -5,6 +5,7 @@ import core.util.Util;
 import game.util.Pathfind;
 import game.util.TimeUtil as Time;
 import game.world.Grid;
+import game.world.Thing;
 
 enum TileItem {
     Entrance;
@@ -30,6 +31,8 @@ function calcPosition (moveFrom:Int, moveTo:Int, percentMoved:Float):Float {
 class World {
     public var grid:Grid<TileItem>;
     public var actors:Array<Actor> = [];
+    public var thingPieces:Array<Piece> = [];
+    public var things:Array<Thing> = [];
     // public var tiles:Grid<TileItem>;
 
     public var entrance:IntVec2;
@@ -42,9 +45,9 @@ class World {
     public var events:Array<Event> = [];
 
     public function new () {
-        final size = new IntVec2(25, 25);
-        entrance = new IntVec2(12, 0);
-        exit = new IntVec2(14, 0);
+        final size = new IntVec2(12, 12);
+        entrance = new IntVec2(5, 0);
+        exit = new IntVec2(7, 0);
 
         grid = {
             width: size.x,
@@ -59,6 +62,8 @@ class World {
         for (_ in 0...3) {
             actors.push(new Actor('test${Actor.curId}'));
         }
+
+        placeThing(PhoneDesk, 1, 1, SouthEast);
     }
 
     public function step ():Bool {
@@ -213,13 +218,39 @@ class World {
 
     // returns true if there is a collision at this position
     function checkCollision (x:Int, y:Int):Bool {
+        // TODO: consider making a grid that we populate with all possible collisions, then checking
+        // against that. would be built once per frame.
         for (i in 0...actors.length) {
             if (actors[i].getX() == x && actors[i].getY() == y) {
                 return true;
             }
         }
 
+        for (i in 0...thingPieces.length) {
+            if (thingPieces[i].x == x && thingPieces[i].y == y) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    function placeThing (type:ThingType, x:Int, y:Int, rotation:RotationDir) {
+        final items = makePiecesGrid(type);
+
+        final parent = new Thing(type);
+
+        things.push(parent);
+
+        // TODO: rotate grid
+        forEachGI(items, (xx, yy, item) -> {
+            trace(checkCollision(x + xx, y + yy), x + xx, y + yy, item);
+            if (item != null && item != EntranceSpot && !checkCollision(x + xx, y + yy)) {
+                thingPieces.push(new Piece(x + xx, y + yy, item, parent));
+            } else {
+                // throw 'Cant place!';
+            }
+        });
     }
 
     inline function wait (actor:Actor, time:Int) {

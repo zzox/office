@@ -167,6 +167,23 @@ class GameScene extends Scene {
             }
         });
 
+        renderItems = renderItems.concat(world.thingPieces.map(p -> {
+            var tileIndex = 0;
+            if (p.type == Phone) {
+                tileIndex = 7 + worldRotation;
+            } else if (p.type == Chair) {
+                tileIndex = 11 + worldRotation;
+            }
+
+            return {
+                x: translateWorldX(p.x, p.y, worldRotation) - charXDiff,
+                y: translateWorldY(p.x, p.y, worldRotation) - charYDiff,
+                tileIndex: tileIndex,
+                flipX: false,
+                shadow: false,
+            }
+        }));
+
         renderItems.sort((a, b) -> {
             return Std.int(a.y) - Std.int(b.y);
         });
@@ -180,18 +197,20 @@ class GameScene extends Scene {
         for (i in 0...renderItems.length) {
             final item = renderItems[i];
 
-            // render shadow
-            g2.color = 0x80 * 0x1000000 + 0xffffff;
-            var tileIndex = 6;
             final cols = Std.int(image.width / sizeX);
-            g2.drawScaledSubImage(
-                image,
-                (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                item.x, item.y,
-                // translateWorldX(item.x, item.y, worldRotation) - charXDiff,
-                // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
-                sizeX, sizeY
-            );
+            // render shadow
+            if (item.shadow) {
+                g2.color = 0x80 * 0x1000000 + 0xffffff;
+                var tileIndex = 6;
+                g2.drawScaledSubImage(
+                    image,
+                    (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
+                    item.x, item.y,
+                    // translateWorldX(item.x, item.y, worldRotation) - charXDiff,
+                    // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
+                    sizeX, sizeY
+                );
+            }
 
             // render actor
             g2.color = 0xff * 0x1000000 + 0xffffff;
@@ -207,10 +226,10 @@ class GameScene extends Scene {
 
         // TODO: adjust this scale nonsenese
         // TODO: particle class that is tied to an x and z position, y position is tied to time
-        final scale = camera.scale;
-        camera.scale = 1;
-        for (n in numbers) if (n.visible) n.render(g2, camera);
-        camera.scale = scale;
+        // final scale = camera.scale;
+        // camera.scale = 1;
+        // for (n in numbers) if (n.visible) n.render(g2, camera);
+        // camera.scale = scale;
 
         g2.popTransformation();
         g2.popTransformation();
