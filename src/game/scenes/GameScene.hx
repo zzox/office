@@ -205,9 +205,8 @@ class GameScene extends Scene {
                 g2.drawScaledSubImage(
                     image,
                     (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                    item.x, item.y,
-                    // translateWorldX(item.x, item.y, worldRotation) - charXDiff,
-                    // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
+                    // item.x, item.y,
+                    Math.floor(item.x), Math.floor(item.y),
                     sizeX, sizeY
                 );
             }
@@ -217,9 +216,8 @@ class GameScene extends Scene {
             g2.drawScaledSubImage(
                 image,
                 (item.tileIndex % cols) * sizeX, Math.floor(item.tileIndex / cols) * sizeY, sizeX, sizeY,
-                item.x + (item.flipX ? sizeX : 0), item.y,
-                // translateWorldX(item.x, item.y, worldRotation) - charXDiff + (flipX ? sizeX : 0),
-                // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
+                // item.x + (item.flipX ? sizeX : 0)), item.y,
+                Math.floor(item.x + (item.flipX ? sizeX : 0)), Math.floor(item.y),
                 sizeX * (item.flipX ? -1 : 1), sizeY
             );
         }

@@ -56,13 +56,23 @@ class World {
             return item;
         });
 
-        for (_ in 0...3) {
+        for (_ in 0...10) {
             actors.push(new Actor('test${Actor.curId}'));
         }
 
         collision = makeGrid(size.x, size.y, 1);
 
-        placeThing(PhoneDesk, 1, 1, SouthEast);
+        placeThing(PhoneDesk, 0, 1, SouthEast);
+        placeThing(PhoneDesk, 2, 1, SouthEast);
+        placeThing(PhoneDesk, 4, 1, SouthEast);
+        placeThing(PhoneDesk, 7, 1, SouthEast);
+        placeThing(PhoneDesk, 9, 1, SouthEast);
+
+        placeThing(PhoneDesk, 1, 8, SouthEast);
+        placeThing(PhoneDesk, 3, 8, SouthEast);
+        placeThing(PhoneDesk, 5, 8, SouthEast);
+        placeThing(PhoneDesk, 7, 8, SouthEast);
+        placeThing(PhoneDesk, 9, 8, SouthEast);
     }
 
     public function step ():Bool {
