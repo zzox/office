@@ -37,6 +37,7 @@ class World {
 
     public var time:Int;
     public var day:Int = -1;
+    public var money:Int = 0;
 
     public var events:Array<Event> = [];
 
@@ -62,6 +63,11 @@ class World {
 
     public function step ():Bool {
         time++;
+
+        // TEMP:
+        if (Math.random() < 0.01) {
+            money += Math.floor(Math.random() * 20);
+        }
 
         // check to see if an actor has arrived
         for (a in actors) {

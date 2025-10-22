@@ -1,11 +1,10 @@
 package game.scenes;
 
 import core.Game;
-import core.components.Family;
 import core.gameobjects.BitmapText;
 import core.scene.Scene;
 import game.ui.UiText;
-import game.util.Utils.getTilePosAt;
+import game.util.Utils;
 import game.world.Grid;
 import game.world.World;
 import haxe.ds.ArraySort;
