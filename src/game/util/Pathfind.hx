@@ -160,6 +160,7 @@ function getMovementCost (grid:Grid<Int>, fromPoint: IntVec2, toPoint: IntVec2):
   return pointCost * multi;
 }
 
+// WARN: returns an array whose points (vec2s) get reused
 function pathfind (
     grid:Grid<Int>,
     startPoint:IntVec2,

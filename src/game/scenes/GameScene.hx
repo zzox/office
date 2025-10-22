@@ -170,9 +170,9 @@ class GameScene extends Scene {
         renderItems = renderItems.concat(world.thingPieces.map(p -> {
             var tileIndex = 0;
             if (p.type == Phone) {
-                tileIndex = 7 + worldRotation;
+                tileIndex = 9 + worldRotation;
             } else if (p.type == Chair) {
-                tileIndex = 11 + worldRotation;
+                tileIndex = 13 + worldRotation;
             }
 
             return {
@@ -201,10 +201,10 @@ class GameScene extends Scene {
             // render shadow
             if (item.shadow) {
                 g2.color = 0x80 * 0x1000000 + 0xffffff;
-                var tileIndex = 6;
+                final shadowIndex = 8;
                 g2.drawScaledSubImage(
                     image,
-                    (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
+                    (shadowIndex % cols) * sizeX, Math.floor(shadowIndex / cols) * sizeY, sizeX, sizeY,
                     // item.x, item.y,
                     Math.floor(item.x), Math.floor(item.y),
                     sizeX, sizeY

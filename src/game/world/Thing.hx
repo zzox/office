@@ -23,6 +23,10 @@ function makePiecesGrid(type:ThingType):Grid<Null<PieceType>> {
     }
 }
 
+function getEntraceSpots (thing:Thing):Array<Piece> {
+    return thing.pieces.filter(p -> p.type == EntranceSpot);
+}
+
 enum PieceType {
     Phone;
     Chair;
@@ -31,10 +35,13 @@ enum PieceType {
 
 // one or more pieces. an inanimate object.
 class Thing {
-    var actor:Null<Actor>;
-    var pieces:Array<Piece>;
+    public var actor:Null<Actor>;
+    public var pieces:Array<Piece> = [];
+    public var type:ThingType;
 
-    public function new (type:ThingType) {}
+    public function new (type:ThingType) {
+        this.type = type;
+    }
 }
 
 // part of a thing

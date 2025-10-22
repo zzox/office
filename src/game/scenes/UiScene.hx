@@ -34,7 +34,6 @@ class UiScene extends Scene {
 
         for (i in 0...8) {
             final text = makeBitmapText(4, 100 + i * 10, '');
-            text.visible = false;
             entities.push(text);
             devTexts.push(text);
         }

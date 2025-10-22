@@ -5,13 +5,13 @@ import game.util.TimeUtil as Time;
 import game.world.Grid.RotationDir;
 
 enum ActorState {
-    None;
-    Wait;
+    None; // ready for our task.
+    Wait; // waiting, usually when a path is blocked
     Move;
     Sell;
-    Break;
-    Talk;
-    Think;
+    // Break;
+    // Talk;
+    // Think;
 }
 
 // what the actor wants to do
@@ -64,6 +64,8 @@ class Actor {
     public var locale:ActorLocale = PreWork;
     public var placement:ActorPlacement = None;
 
+    public var desk:Null<Thing>;
+
     public var arriveTime:Int;
     
     public function new (name:String) {
@@ -77,9 +79,16 @@ class Actor {
         // reset daily values
         state = None;
         locale = PreWork;
-        placement = None;
         goal = Work;
+        placement = None;
         arriveTime = Math.floor(Time.hours(3) + Math.random() * Time.hours(2));
+    }
+
+    public function assignDesk (desk:Thing) {
+        if (desk.type != PhoneDesk) {
+            throw 'Not a desk!';
+        }
+        this.desk = desk;
     }
 
     public inline function getX ():Int {

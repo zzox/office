@@ -56,10 +56,6 @@ class World {
             return item;
         });
 
-        for (_ in 0...10) {
-            actors.push(new Actor('test${Actor.curId}'));
-        }
-
         collision = makeGrid(size.x, size.y, 1);
 
         placeThing(PhoneDesk, 0, 1, SouthEast);
@@ -73,6 +69,12 @@ class World {
         placeThing(PhoneDesk, 5, 8, SouthEast);
         placeThing(PhoneDesk, 7, 8, SouthEast);
         placeThing(PhoneDesk, 9, 8, SouthEast);
+
+        for (_ in 0...10) {
+            final actor = new Actor('test${Actor.curId}');
+            actor.assignDesk(things[actors.length]);
+            actors.push(actor);
+        }
     }
 
     public function step ():Bool {
@@ -82,11 +84,6 @@ class World {
         collision.items = collision.items.map(_ -> 1);
         for (a in actors) collision.items[a.getX() + a.getY() * grid.width] = 0;
         for (p in thingPieces) collision.items[p.x + p.y * grid.width] = 0;
-
-        // TEMP:
-        if (Math.random() < 0.01) {
-            money += Math.floor(Math.random() * 20);
-        }
 
         // check to see if an actor has arrived
         for (a in actors) {
@@ -110,27 +107,27 @@ class World {
             if (a.locale != AtWork || a.state == Move) continue;
             a.stateTime--;
 
+            // if time doing our state ran out, we can do another thing
             if (a.stateTime == 0) {
+                // if we've been here 8 hours, leave
                 if (time > a.arriveTime + Time.hours(8) && time > Time.FIVE_PM) {
-                    goHome(a);
+                    a.goal = Leave;
                 }
 
-                // what do we do when we're done with our task?
-                if (a.state == None) {
-                    if (a.goal == Leave) {
-                        if (a.isAt(exit.x, exit.y)) {
-                            leave(a);
-                            continue;
-                        }
-
-                        tryMoveActor(a, exit.x, exit.y);
+                // if goal is to leave, head towards the exit
+                if (a.goal == Leave) {
+                    if (a.isAt(exit.x, exit.y)) {
+                        leave(a);
                     } else {
-                        tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
-                    }
-                } else if (a.state == Wait) {
-                    // TODO: DRY
-                    if (a.goal == Leave) {
                         tryMoveActor(a, exit.x, exit.y);
+                    }
+                    // continue;
+                } else if (a.goal == Work) {
+                    if (a.placement == Desk) {
+                        sell(a);
+                    } else if (a.desk != null) {
+                        // if at desk, get on, otherwise go to it
+                        tryGoDesk(a);
                     } else {
                         tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
                     }
@@ -158,6 +155,16 @@ class World {
         }, 0);
 
         return !(time > Time.FIVE_PM && actorsPresent == 0);
+    }
+
+    function tryGoDesk (actor:Actor) {
+        final pos = getEntraceSpots(actor.desk)[0];
+        tryMoveActor(actor, pos.x, pos.y);
+    }
+
+    function sell (actor:Actor) {
+        actor.state = Sell;
+        actor.stateTime = Time.QTR_HOUR;
     }
 
     function arrive (actor:Actor) {
@@ -255,6 +262,7 @@ class World {
         // return false;
     }
 
+    // TODO: move parts of this to makeThing method?
     function placeThing (type:ThingType, x:Int, y:Int, rotation:RotationDir) {
         final items = makePiecesGrid(type);
 
@@ -264,9 +272,12 @@ class World {
 
         // TODO: rotate grid
         forEachGI(items, (xx, yy, item) -> {
-            trace(checkCollision(x + xx, y + yy), x + xx, y + yy, item);
-            if (item != null && item != EntranceSpot && !checkCollision(x + xx, y + yy)) {
-                thingPieces.push(new Piece(x + xx, y + yy, item, parent));
+            if (item != null && !checkCollision(x + xx, y + yy)) {
+                final piece = new Piece(x + xx, y + yy, item, parent);
+                if (item != EntranceSpot) {
+                    thingPieces.push(piece);
+                }
+                parent.pieces.push(piece);
             } else {
                 // throw 'Cant place!';
             }
@@ -278,9 +289,10 @@ class World {
         actor.stateTime = time;
     }
 
-    inline function goHome (actor:Actor) {
-        actor.goal = Leave;
-    }
+    // single line functions make more sense to just write out
+    // inline function goHome (actor:Actor) {
+    //     actor.goal = Leave;
+    // }
 
     inline function addEvent (type:EventType, actor:Actor) {
         events.push({ type: type, actor: actor });
