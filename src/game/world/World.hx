@@ -37,6 +37,7 @@ class World {
 
     public var entrance:IntVec2;
     public var exit:IntVec2;
+    var collision:Grid<Int>;
 
     public var time:Int;
     public var day:Int = -1;
@@ -49,25 +50,28 @@ class World {
         entrance = new IntVec2(5, 0);
         exit = new IntVec2(7, 0);
 
-        grid = {
-            width: size.x,
-            height: size.y,
-            items: mapGIItems(makeGrid(size.x, size.y, Tile), (x, y, item) -> {
-                if (entrance.x == x && entrance.y == y) return Entrance;
-                if (exit.x == x && exit.y == y) return Exit;
-                return item;
-            })
-        }
+        grid = mapGI(makeGrid(size.x, size.y, Tile), (x, y, item) -> {
+            if (entrance.x == x && entrance.y == y) return Entrance;
+            if (exit.x == x && exit.y == y) return Exit;
+            return item;
+        });
 
         for (_ in 0...3) {
             actors.push(new Actor('test${Actor.curId}'));
         }
+
+        collision = makeGrid(size.x, size.y, 1);
 
         placeThing(PhoneDesk, 1, 1, SouthEast);
     }
 
     public function step ():Bool {
         time++;
+
+        // update collision array
+        collision.items = collision.items.map(_ -> 1);
+        for (a in actors) collision.items[a.getX() + a.getY() * grid.width] = 0;
+        for (p in thingPieces) collision.items[p.x + p.y * grid.width] = 0;
 
         // TEMP:
         if (Math.random() < 0.01) {
@@ -165,7 +169,9 @@ class World {
             throw 'Should not move from uneven spots';
         }
 #end
-        final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(actor.getX(), actor.getY()), new IntVec2(x, y), Manhattan);
+
+        final path = pathfind(collision, new IntVec2(actor.getX(), actor.getY()), new IntVec2(x, y), Manhattan);
+        // final path = pathfind(makeGrid(grid.width, grid.height, 1), new IntVec2(actor.getX(), actor.getY()), new IntVec2(x, y), Manhattan);
         if (path != null) {
             actor.path = clonePath(path);
             actor.state = Move;
@@ -220,19 +226,23 @@ class World {
     function checkCollision (x:Int, y:Int):Bool {
         // TODO: consider making a grid that we populate with all possible collisions, then checking
         // against that. would be built once per frame.
-        for (i in 0...actors.length) {
-            if (actors[i].getX() == x && actors[i].getY() == y) {
-                return true;
-            }
-        }
+        // for (i in 0...actors.length) {
+        //     if (actors[i].getX() == x && actors[i].getY() == y) {
+        //         return true;
+        //     }
+        // }
 
-        for (i in 0...thingPieces.length) {
-            if (thingPieces[i].x == x && thingPieces[i].y == y) {
-                return true;
-            }
-        }
+        // for (i in 0...thingPieces.length) {
+        //     if (thingPieces[i].x == x && thingPieces[i].y == y) {
+        //         return true;
+        //     }
+        // }
 
-        return false;
+        final item = getGridItem(collision, x, y);
+
+        return item == null || item == 0;
+
+        // return false;
     }
 
     function placeThing (type:ThingType, x:Int, y:Int, rotation:RotationDir) {

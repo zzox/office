@@ -55,7 +55,7 @@ function forEachGI<T> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> Void) {
     }
 }
 
-function mapGIItems<T, TT> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> TT):Array<TT> {
+function mapGI<T, TT> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> TT):Grid<TT> {
     // don't know about this as it requires a cast
     // if (callback == null) {
     //     callback = (x:Int, y:Int, item:T) -> { return cast(item); };
@@ -68,7 +68,12 @@ function mapGIItems<T, TT> (grid:Grid<T>, callback:(x:Int, y:Int, item:T) -> TT)
             items.push(callback(x, y, grid.items[x + y * grid.width]));
         }
     }
-    return items;
+
+    return {
+        width: grid.width,
+        height: grid.height,
+        items: items
+    }
 }
 
 function getGridItem<T> (grid:Grid<T>, x:Int, y:Int):Null<T> {
@@ -93,4 +98,12 @@ function calculateFacing (actorFacing:Int, worldRotation:Int):RotationDir {
         num += 4;
     }
     return cast(num);
+}
+
+function gridFromItems <T>(width:Int, height:Int, items:Array<T>):Grid<T> {
+    return {
+        width: width,
+        height: height,
+        items: items
+    }
 }

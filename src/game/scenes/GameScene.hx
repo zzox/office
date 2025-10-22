@@ -259,7 +259,7 @@ class GameScene extends Scene {
     }
 
     function makeTilemap () {
-        final items = mapGIItems(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } });
+        final items = mapGI(world.grid, (x, y, item) -> { return { item: item, x: x, y: y } }).items;
         ArraySort.sort(items, (a, b) -> Std.int(translateWorldY(a.x, a.y, worldRotation)) - Std.int(translateWorldY(b.x, b.y, worldRotation)));
 
         // there's a more mathematical way to do this, but looping through all works
