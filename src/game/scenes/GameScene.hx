@@ -18,6 +18,14 @@ import kha.math.FastVector2;
 final TILE_WIDTH = 16;
 final TILE_HEIGHT = 8;
 
+typedef RenderItem = {
+    var x:Float;
+    var y:Float;
+    var tileIndex:Int;
+    var shadow:Bool;
+    var flipX:Bool;
+}
+
 class GameScene extends Scene {
     var world:World;
     var uiScene:UiScene;
@@ -136,10 +144,31 @@ class GameScene extends Scene {
         final charXDiff = 0;
         final charYDiff = 24;
 
-        final actors = world.actors.copy();
+        var renderItems:Array<RenderItem> = world.actors.map(actor -> {
+            var tileIndex = 0;
+            var flipX = false;
 
-        actors.sort((a, b) -> {
-            return Std.int(translateWorldY(a.x, a.y, SouthEast)) - Std.int(translateWorldY(b.x, b.y, SouthEast));
+            // figure facing
+            final facingDir = calculateFacing(actor.facing, worldRotation);
+
+            if (actor.move != null) {
+                // can the fifth index happen?                                                             vvv
+                tileIndex = (facingDir == NorthEast || facingDir == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
+                flipX = facingDir == NorthWest || facingDir == SouthWest;
+            } else {
+                tileIndex = 0;
+            }
+            return {
+                x: translateWorldX(actor.x, actor.y, worldRotation) - charXDiff,
+                y: translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
+                tileIndex: tileIndex,
+                flipX: flipX,
+                shadow: true,
+            }
+        });
+
+        renderItems.sort((a, b) -> {
+            return Std.int(a.y) - Std.int(b.y);
         });
 
         // tile size here
@@ -148,8 +177,8 @@ class GameScene extends Scene {
 
         final image = Assets.images.char;
 
-        for (i in 0...actors.length) {
-            final actor = actors[i];
+        for (i in 0...renderItems.length) {
+            final item = renderItems[i];
 
             // render shadow
             g2.color = 0x80 * 0x1000000 + 0xffffff;
@@ -158,30 +187,21 @@ class GameScene extends Scene {
             g2.drawScaledSubImage(
                 image,
                 (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                translateWorldX(actor.x, actor.y, worldRotation) - charXDiff,
-                translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
+                item.x, item.y,
+                // translateWorldX(item.x, item.y, worldRotation) - charXDiff,
+                // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
                 sizeX, sizeY
             );
 
-            // figure facing
-            final facingDir = calculateFacing(actor.facing, worldRotation);
-
             // render actor
             g2.color = 0xff * 0x1000000 + 0xffffff;
-            var flipX = false;
-            if (actor.move != null) {
-                // can the fifth index happen?                                                             vvv
-                tileIndex = (facingDir == NorthEast || facingDir == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
-                flipX = facingDir == NorthWest || facingDir == SouthWest;
-            } else {
-                tileIndex = 0;
-            }
             g2.drawScaledSubImage(
                 image,
-                (tileIndex % cols) * sizeX, Math.floor(tileIndex / cols) * sizeY, sizeX, sizeY,
-                translateWorldX(actor.x, actor.y, worldRotation) - charXDiff + (flipX ? sizeX : 0),
-                translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
-                sizeX * (flipX ? -1 : 1), sizeY
+                (item.tileIndex % cols) * sizeX, Math.floor(item.tileIndex / cols) * sizeY, sizeX, sizeY,
+                item.x + (item.flipX ? sizeX : 0), item.y,
+                // translateWorldX(item.x, item.y, worldRotation) - charXDiff + (flipX ? sizeX : 0),
+                // translateWorldY(item.x, item.y, worldRotation) - charYDiff,
+                sizeX * (item.flipX ? -1 : 1), sizeY
             );
         }
 
