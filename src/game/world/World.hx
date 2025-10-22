@@ -65,7 +65,7 @@ class World {
 
         // check to see if an actor has arrived
         for (a in actors) {
-            if (a.location == PreWork) {
+            if (a.locale == PreWork) {
                 if (a.arriveTime == this.time) {
                     arrive(a);
                     tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
@@ -82,7 +82,7 @@ class World {
 
         for (a in actors) {
             // if we're moving or not at work, don't do anything
-            if (a.location != AtWork || a.state == Move) continue;
+            if (a.locale != AtWork || a.state == Move) continue;
             a.stateTime--;
 
             if (a.stateTime == 0) {
@@ -129,20 +129,20 @@ class World {
         // do the action
 
         final actorsPresent = Lambda.fold(actors, (actor:Actor, res:Int) -> {
-            return res + (actor.location == AtWork ? 1 : 0);
+            return res + (actor.locale == AtWork ? 1 : 0);
         }, 0);
 
         return !(time > Time.FIVE_PM && actorsPresent == 0);
     }
 
     function arrive (actor:Actor) {
-        actor.location = AtWork;
+        actor.locale = AtWork;
         actor.x = entrance.x;
         actor.y = entrance.y;
     }
 
     function leave (actor:Actor) {
-        actor.location = PostWork;
+        actor.locale = PostWork;
         actor.state = None;
         actor.x = -16;
         actor.y = -16;

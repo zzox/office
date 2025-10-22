@@ -21,11 +21,16 @@ enum ActorGoal {
     Leave;
 }
 
-// TODO: better naming?
-enum ActorLocation {
+// whether the actor is at work or not, also if they've been in that day
+enum ActorLocale {
     PreWork;
     AtWork;
     PostWork;
+}
+
+enum ActorPlacement {
+    None;
+    Desk;
 }
 
 typedef Move = {
@@ -56,7 +61,8 @@ class Actor {
     public var facing:RotationDir = SouthEast;
 
     public var goal:ActorGoal = Work;
-    public var location:ActorLocation = PreWork;
+    public var locale:ActorLocale = PreWork;
+    public var placement:ActorPlacement = None;
 
     public var arriveTime:Int;
     
@@ -70,7 +76,8 @@ class Actor {
     public function startDay () {
         // reset daily values
         state = None;
-        location = PreWork;
+        locale = PreWork;
+        placement = None;
         goal = Work;
         arriveTime = Math.floor(Time.hours(3) + Math.random() * Time.hours(2));
     }
