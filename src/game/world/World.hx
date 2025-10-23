@@ -173,6 +173,7 @@ class World {
     function getOnDesk (actor:Actor) {
         actor.x = actor.desk.useItem.x;
         actor.y = actor.desk.useItem.y;
+        actor.facing = actor.desk.useItem.rotation;
         actor.placement = Desk;
     }
 
@@ -216,6 +217,7 @@ class World {
         if (path != null) {
             actor.path = clonePath(path);
             actor.state = Move;
+            actor.placement = None; // unsets the actor from a desk
             addEvent(Temp, actor);
         } else {
             // TODO: remove
@@ -297,7 +299,7 @@ class World {
         // TODO: rotate grid
         forEachGI(items, (xx, yy, item) -> {
             if (item != null && !checkCollision(x + xx, y + yy)) {
-                final piece = new Piece(x + xx, y + yy, item, parent);
+                final piece = new Piece(x + xx, y + yy, item, parent, rotation);
                 if (item != EntranceSpot) {
                     thingPieces.push(piece);
                 }

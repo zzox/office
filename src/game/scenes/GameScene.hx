@@ -146,21 +146,30 @@ class GameScene extends Scene {
 
         var renderItems:Array<RenderItem> = world.actors.map(actor -> {
             var tileIndex = 0;
-            var flipX = false;
 
             // figure facing
             final facingDir = calculateFacing(actor.facing, worldRotation);
 
-            if (actor.move != null) {
+            final flipX = facingDir == NorthWest || facingDir == SouthWest;
+
+            var placementDiff = 0;
+            if (actor.placement == Desk) {
+                if (facingDir == SouthEast || facingDir == SouthWest) {
+                    tileIndex = 6;
+                    placementDiff = 1;
+                } else {
+                    tileIndex = 7;
+                    placementDiff = -1;
+                }
+            } else if (actor.move != null) {
                 // can the fifth index happen?                                                             vvv
                 tileIndex = (facingDir == NorthEast || facingDir == NorthWest ? 3 : 0) + [1, 0, 2, 0, 0][Math.floor(actor.move.elapsed / actor.move.time * 4)];
-                flipX = facingDir == NorthWest || facingDir == SouthWest;
             } else {
-                tileIndex = 0;
+                tileIndex = (facingDir == NorthEast || facingDir == NorthWest ? 3 : 0);
             }
             return {
                 x: translateWorldX(actor.x, actor.y, worldRotation) - charXDiff,
-                y: translateWorldY(actor.x, actor.y, worldRotation) - charYDiff + (actor.placement == Desk ? 1 : 0),
+                y: translateWorldY(actor.x, actor.y, worldRotation) - charYDiff + placementDiff,
                 tileIndex: tileIndex,
                 flipX: flipX,
                 shadow: true,

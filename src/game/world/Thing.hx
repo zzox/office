@@ -1,5 +1,7 @@
 package game.world;
 
+import game.world.Grid.RotationDir;
+
 enum ThingType {
     PhoneDesk;
 }
@@ -52,12 +54,14 @@ class Piece {
 
     public var parent:Thing;
     public var type:PieceType;
+    public var rotation:RotationDir;
 
-    public function new (x:Int, y:Int, type:PieceType, parent:Thing) {
+    public function new (x:Int, y:Int, type:PieceType, parent:Thing, rotation:RotationDir) {
         this.x = x;
         this.y = y;
 
         this.type = type;
         this.parent = parent;
+        this.rotation = rotation;
     }
 }
