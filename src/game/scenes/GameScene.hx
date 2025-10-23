@@ -160,7 +160,7 @@ class GameScene extends Scene {
             }
             return {
                 x: translateWorldX(actor.x, actor.y, worldRotation) - charXDiff,
-                y: translateWorldY(actor.x, actor.y, worldRotation) - charYDiff,
+                y: translateWorldY(actor.x, actor.y, worldRotation) - charYDiff + (actor.placement == Desk ? 1 : 0),
                 tileIndex: tileIndex,
                 flipX: flipX,
                 shadow: true,

@@ -107,7 +107,7 @@ class World {
             if (a.locale != AtWork || a.state == Move) continue;
             a.stateTime--;
 
-            // if time doing our state ran out, we can do another thing
+            // if time doing our state ran out, actor does something
             if (a.stateTime == 0) {
                 // if we've been here 8 hours, leave
                 if (time > a.arriveTime + Time.hours(8) && time > Time.FIVE_PM) {
@@ -118,19 +118,27 @@ class World {
                 if (a.goal == Leave) {
                     if (a.isAt(exit.x, exit.y)) {
                         leave(a);
+                        continue;
                     } else {
                         tryMoveActor(a, exit.x, exit.y);
                     }
-                    // continue;
                 } else if (a.goal == Work) {
+                    if (a.placement != Desk && a.desk != null) {
+                        // if at desk, get on, otherwise go to it
+                        if (atEntranceSpot(a, a.desk)) {
+                            getOnDesk(a);
+                        } else {
+                            tryGoDesk(a);
+                        }
+                    }
+
                     if (a.placement == Desk) {
                         sell(a);
-                    } else if (a.desk != null) {
-                        // if at desk, get on, otherwise go to it
-                        tryGoDesk(a);
-                    } else {
-                        tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
                     }
+
+                    // } else {
+                    //     tryMoveActor(a, randomInt(grid.width), randomInt(grid.height));
+                    // }
                 }
             }
 
@@ -158,8 +166,24 @@ class World {
     }
 
     function tryGoDesk (actor:Actor) {
-        final pos = getEntraceSpots(actor.desk)[0];
+        final pos = getEntranceSpots(actor.desk)[0];
         tryMoveActor(actor, pos.x, pos.y);
+    }
+
+    function getOnDesk (actor:Actor) {
+        actor.x = actor.desk.useItem.x;
+        actor.y = actor.desk.useItem.y;
+        actor.placement = Desk;
+    }
+
+    function atEntranceSpot (actor:Actor, thing:Thing):Bool {
+        final spots = getEntranceSpots(thing);
+        for (s in spots) {
+            if (actor.isAt(s.x, s.y)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function sell (actor:Actor) {
@@ -278,6 +302,11 @@ class World {
                     thingPieces.push(piece);
                 }
                 parent.pieces.push(piece);
+
+                // assign the usable piece to the parent
+                if (item == Chair) {
+                    parent.useItem = piece;
+                }
             } else {
                 // throw 'Cant place!';
             }

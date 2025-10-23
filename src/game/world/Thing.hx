@@ -23,7 +23,7 @@ function makePiecesGrid(type:ThingType):Grid<Null<PieceType>> {
     }
 }
 
-function getEntraceSpots (thing:Thing):Array<Piece> {
+function getEntranceSpots (thing:Thing):Array<Piece> {
     return thing.pieces.filter(p -> p.type == EntranceSpot);
 }
 
@@ -38,6 +38,7 @@ class Thing {
     public var actor:Null<Actor>;
     public var pieces:Array<Piece> = [];
     public var type:ThingType;
+    public var useItem:Piece;
 
     public function new (type:ThingType) {
         this.type = type;
