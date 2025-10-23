@@ -233,10 +233,10 @@ class GameScene extends Scene {
 
         // TODO: adjust this scale nonsenese
         // TODO: particle class that is tied to an x and z position, y position is tied to time
-        // final scale = camera.scale;
-        // camera.scale = 1;
-        // for (n in numbers) if (n.visible) n.render(g2, camera);
-        // camera.scale = scale;
+        final scale = camera.scale;
+        camera.scale = 1;
+        for (n in numbers) if (n.visible) n.render(g2, camera);
+        camera.scale = scale;
 
         g2.popTransformation();
         g2.popTransformation();

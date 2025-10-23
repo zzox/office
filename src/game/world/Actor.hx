@@ -1,6 +1,7 @@
 package game.world;
 
 import core.Types;
+import game.data.Leads.LeadTier;
 import game.util.TimeUtil as Time;
 import game.world.Grid.RotationDir;
 
@@ -50,6 +51,7 @@ class Actor {
 
     // 0-10000 stats
     public final speed:Int = 5000; // 20 frames a square
+    public var skill:Float;
 
     // dynamic vals
     public var x:Float = -16.0;
@@ -65,6 +67,9 @@ class Actor {
     public var placement:ActorPlacement = None;
 
     public var desk:Null<Thing>;
+    public var lead:Null<LeadTier>;
+    public var salesAttempts:Int = 0;
+    public var salesSuccess:Int = 0;
 
     public var arriveTime:Int;
     
@@ -73,6 +78,7 @@ class Actor {
         id = curId++;
         speed = 2000 + Math.floor(Math.random() * 4000);
         // max is 10000?
+        skill = 0.2 + Math.random() * 0.8;
     }
 
     public function startDay () {

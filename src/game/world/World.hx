@@ -2,6 +2,7 @@ package game.world;
 
 import core.Types.IntVec2;
 import core.util.Util;
+import game.data.Leads;
 import game.util.Pathfind;
 import game.util.TimeUtil as Time;
 import game.world.Grid;
@@ -44,6 +45,13 @@ class World {
     public var money:Int = 0;
 
     public var events:Array<Event> = [];
+
+    public var leadMap:Map<LeadTier, Int> = [
+        TierS => 0,
+        TierA => 0,
+        TierB => 0,
+        TierC => 0,
+    ];
 
     public function new () {
         final size = new IntVec2(12, 12);
@@ -109,6 +117,21 @@ class World {
 
             // if time doing our state ran out, actor does something
             if (a.stateTime == 0) {
+                // result of state
+                if (a.state == Sell) {
+                    // TODO: endSell method?
+                    trace(a.skill * leadChance.get(a.lead));
+                    final success = Math.random() < a.skill * leadChance.get(a.lead);
+                    a.salesAttempts++;
+                    if (success) {
+                        a.salesSuccess++;
+                        addEvent(Temp, a);
+                    }
+                    a.lead = null;
+                }
+
+                // what to do next
+
                 // if we've been here 8 hours, leave
                 if (time > a.arriveTime + Time.hours(8) && time > Time.FIVE_PM) {
                     a.goal = Leave;
@@ -190,6 +213,7 @@ class World {
     function sell (actor:Actor) {
         actor.state = Sell;
         actor.stateTime = Time.QTR_HOUR;
+        actor.lead = getLead();
     }
 
     function arrive (actor:Actor) {
@@ -218,7 +242,6 @@ class World {
             actor.path = clonePath(path);
             actor.state = Move;
             actor.placement = None; // unsets the actor from a desk
-            addEvent(Temp, actor);
         } else {
             // TODO: remove
             trace('could not find path');
@@ -286,6 +309,18 @@ class World {
         return item == null || item == 0;
 
         // return false;
+    }
+
+    function getLead ():LeadTier {
+        for (lead in leadHiLo) {
+            final nums = leadMap.get(lead);
+            if (nums > 0) {
+                leadMap.set(lead, nums - 1);
+                return lead;
+            }
+        }
+
+        return TierF;
     }
 
     // TODO: move parts of this to makeThing method?
