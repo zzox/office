@@ -291,11 +291,11 @@ class GameScene extends Scene {
         final image = Assets.images.tiles;
         final cols = Std.int(image.width / sizeX);
         for (i in 0...items.length) {
-            var tileIndex = 0;
+            var tileIndex = (items[i].x + items[i].y) % 2;
             if (items[i].item == Entrance) {
-                tileIndex = 1;
-            } else if (items[i].item == Exit) {
                 tileIndex = 2;
+            } else if (items[i].item == Exit) {
+                tileIndex = 3;
             }
 
             tilemap.g2.drawSubImage(
