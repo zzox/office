@@ -112,7 +112,7 @@ class GameScene extends Scene {
 
         for (ev in world.getEvents()) {
             if (ev.type == Temp) {
-                makeNumber(ev.actor.x, ev.actor.y, Math.floor(Math.random() * 100));
+                makeNumber(ev.actor.x, ev.actor.y, ev.amount);
             }
         }
 
@@ -228,6 +228,7 @@ class GameScene extends Scene {
         for (n in numbers) {
             if (n.visible) {
                 n.rotation = worldRotation;
+                // ATTN: consider moving update loop out
                 n.update(1 / 60);
                 n.render(g2, camera);
             }

@@ -56,17 +56,17 @@ class Actor {
     // dynamic vals
     public var x:Float = -16.0;
     public var y:Float = -16.0;
+    public var facing:RotationDir = SouthEast;
     public var state:ActorState = None;
     public var stateTime:Int = 0;
     public var move:Null<Move>;
     public var path:Array<IntVec2> = [];
-    public var facing:RotationDir = SouthEast;
-
     public var goal:ActorGoal = Work;
     public var locale:ActorLocale = PreWork;
     public var placement:ActorPlacement = None;
 
     public var desk:Null<Thing>;
+    // sales stuff
     public var lead:Null<LeadTier>;
     public var salesAttempts:Int = 0;
     public var salesSuccess:Int = 0;
@@ -76,8 +76,8 @@ class Actor {
     public function new (name:String) {
         this.name = name;
         id = curId++;
-        speed = 2000 + Math.floor(Math.random() * 4000);
         // max is 10000?
+        speed = 2000 + Math.floor(Math.random() * 4000);
         skill = 0.2 + Math.random() * 0.8;
     }
 

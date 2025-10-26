@@ -23,6 +23,7 @@ enum EventType {
 typedef Event = {
     var type:EventType;
     var actor:Actor;
+    var ?amount:Int;
 }
 
 function calcPosition (moveFrom:Int, moveTo:Int, percentMoved:Float):Float {
@@ -125,7 +126,7 @@ class World {
                     a.salesAttempts++;
                     if (success) {
                         a.salesSuccess++;
-                        addEvent(Temp, a);
+                        addEvent(Temp, a, 25 + Math.floor(Math.random() * 25));
                     }
                     a.lead = null;
                 }
@@ -360,8 +361,8 @@ class World {
     //     actor.goal = Leave;
     // }
 
-    inline function addEvent (type:EventType, actor:Actor) {
-        events.push({ type: type, actor: actor });
+    inline function addEvent (type:EventType, actor:Actor, ?amount:Int) {
+        events.push({ type: type, actor: actor, amount: amount });
     }
 
     // actor is ready for a new state
