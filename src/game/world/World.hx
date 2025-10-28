@@ -17,7 +17,8 @@ enum TileItem {
 enum EventType {
     Arrive;
     Leave;
-    Temp;
+    PlusMoney;
+    MinusMoney;
 }
 
 typedef Event = {
@@ -43,7 +44,7 @@ class World {
 
     public var time:Int;
     public var day:Int = -1;
-    public var money:Int = 0;
+    public var money:Int = 1000;
 
     public var events:Array<Event> = [];
 
@@ -121,12 +122,13 @@ class World {
                 // result of state
                 if (a.state == Sell) {
                     // TODO: endSell method?
-                    trace(a.skill * leadChance.get(a.lead));
                     final success = Math.random() < a.skill * leadChance.get(a.lead);
                     a.salesAttempts++;
                     if (success) {
                         a.salesSuccess++;
-                        addEvent(Temp, a, 25 + Math.floor(Math.random() * 25));
+                        final amount = 25 + Math.floor(Math.random() * 25);
+                        addEvent(PlusMoney, a, amount);
+                        money += amount;
                     }
                     a.lead = null;
                 }
@@ -224,6 +226,11 @@ class World {
     }
 
     function leave (actor:Actor) {
+        if ((day + 1) % 5 == 0) {
+            money -= actor.salary;
+            addEvent(MinusMoney, actor, actor.salary);
+            trace(actor.x, actor.y);
+        }
         actor.locale = PostWork;
         actor.state = None;
         actor.x = -16;

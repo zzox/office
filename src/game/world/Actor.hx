@@ -65,6 +65,8 @@ class Actor {
     public var locale:ActorLocale = PreWork;
     public var placement:ActorPlacement = None;
 
+    public var salary:Int;
+
     public var desk:Null<Thing>;
     // sales stuff
     public var lead:Null<LeadTier>;
@@ -72,13 +74,14 @@ class Actor {
     public var salesSuccess:Int = 0;
 
     public var arriveTime:Int;
-    
+
     public function new (name:String) {
         this.name = name;
         id = curId++;
         // max is 10000?
         speed = 2000 + Math.floor(Math.random() * 4000);
         skill = 0.2 + Math.random() * 0.8;
+        salary = 100 + Math.floor(Math.random() * 25);
     }
 
     public function startDay () {

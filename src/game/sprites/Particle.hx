@@ -5,6 +5,11 @@ import game.ui.UiText;
 import game.world.Grid;
 import kha.Assets;
 
+enum abstract PColor(Int) to Int {
+    var Green = 0x6cd947;
+    var Red = 0xe23d69;
+}
+
 class Particle extends BitmapText {
     static inline final MAX_TIME:Float = 3.0;
     var time:Float;
@@ -16,12 +21,12 @@ class Particle extends BitmapText {
         super(-16, -16, Assets.images.cards_text_outline, UiText.smallFont, '');
     }
 
-    public function show (x:Float, y:Float) {
+    public function show (x:Float, y:Float, color:PColor) {
         time = 0.0;
         this.worldX = x;
         this.worldY = y;
         visible = true;
-        color = 0x6cd947;
+        this.color = color;
     }
 
     override function update (delta:Float) {

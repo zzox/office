@@ -111,8 +111,12 @@ class GameScene extends Scene {
         }
 
         for (ev in world.getEvents()) {
-            if (ev.type == Temp) {
-                makeNumber(ev.actor.x, ev.actor.y, ev.amount);
+            if (ev.type == MinusMoney) {
+                // makeNumber(ev.actor.x, ev.actor.y, ev.amount, false);
+                // TEMP: we use the exit position
+                makeNumber(world.exit.x, world.exit.y, ev.amount, false);
+            } else if (ev.type == PlusMoney) {
+                makeNumber(ev.actor.x, ev.actor.y, ev.amount, true);
             }
         }
 
@@ -250,9 +254,9 @@ class GameScene extends Scene {
     }
 
     var numIndex = -1;
-    function makeNumber (x:Float, y:Float, amount:Int) {
+    function makeNumber (x:Float, y:Float, amount:Int, green:Bool) {
         final num = numbers[(++numIndex % numbers.length)];
-        num.show(x, y);
+        num.show(x, y, green ? Green : Red);
         num.setText('$' + amount);
     }
 
